@@ -20,5 +20,5 @@ func main() {
 		return
 	}
 
-	fmt.Printf("%+v\n", configs)
+	fmt.Printf("%+v\n", configs.DMS)
 }
