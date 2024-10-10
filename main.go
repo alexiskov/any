@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 	"os"
-	"project/confreader"
-	"project/htpsrv"
+	"project/htpcli"
 	"project/logger"
-	"strconv"
 )
 
 func main() {
@@ -16,15 +16,16 @@ func main() {
 	logger.InitDebugJSONlog(os.Stdout)
 	logger.Info("debug log stream status is run!")
 
-	configs, err := confreader.LoadConfig()
+	cli := htpcli.HTTPclient{Socket: &http.Client{}}
+	resp, err := cli.NewGet("https://api.hh.ru/vacancies", map[string]string{"User-Agent": "HH-User-Agent"}).Do()
 	if err != nil {
 		logger.Debug(err.Error())
-		return
 	}
-	logger.Info("configs loaded.")
 
-	logger.Info("webservice is ON, port: " + strconv.Itoa(configs.WebServer.Port))
-	htpsrv.Start(configs.WebServer.Port)
+	if b, err := io.ReadAll(resp.Body); err != nil {
+		logger.Debug(err.Error())
+	} else {
+		fmt.Printf("%s", string(b))
+	}
 
-	fmt.Printf("%+v\n", configs.DMS)
 }
