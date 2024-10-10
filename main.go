@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"os"
 	"project/confreader"
+	"project/htpsrv"
 	"project/logger"
+	"strconv"
 )
 
 func main() {
@@ -19,6 +21,10 @@ func main() {
 		logger.Debug(err.Error())
 		return
 	}
+	logger.Info("configs loaded.")
+
+	logger.Info("webservice is ON, port: " + strconv.Itoa(configs.WebServer.Port))
+	htpsrv.Start(configs.WebServer.Port)
 
 	fmt.Printf("%+v\n", configs.DMS)
 }
