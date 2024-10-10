@@ -8,9 +8,10 @@ import (
 	"project/htpcli"
 )
 
+// sent query to HH
 func StartHH() error {
-	cli := htpcli.HTTPclient{Socket: &http.Client{}}
-	resp, err := cli.NewGet("https://api.hh.ru/vacancies?text=golang", map[string]string{"User-Agent": "HH-User-Agent"}).Do()
+	hh := htpcli.HTTPclient{Socket: &http.Client{}}
+	resp, err := hh.NewGet("https://api.hh.ru/vacancies?text=golang&period=1", map[string]string{"User-Agent": "HH-User-Agent"}).Do()
 	if err != nil {
 		return err
 	}
