@@ -14,15 +14,6 @@ type (
 		Body    []byte
 		Headers map[string]string
 	}
-
-	HHvacancyQueryBody struct {
-		SearchFields []VacancySearch `json:"vacancy_search_fields"`
-	}
-
-	VacancySearch struct {
-		ID   string `json:"id"`
-		Name string `json:"name"`
-	}
 )
 
 // client types init
@@ -34,13 +25,15 @@ func (cli *HTTPclient) NewGet(url string, headers map[string]string) *HTTPclient
 	return cli
 }
 
-func (cli *HTTPclient) NewPost(url string, headers map[string]string, body []byte) {
+func (cli *HTTPclient) NewPost(url string, headers map[string]string, body []byte) *HTTPclient {
 	cli.URL = url
 	cli.Method = http.MethodPost
 	cli.Body = body
 	cli.Headers = headers
+	return cli
 }
 
+// sent client request
 func (cli *HTTPclient) Do() (resp *http.Response, err error) {
 	reader := bytes.NewReader(cli.Body)
 	req, err := http.NewRequest(cli.Method, cli.URL, reader)
@@ -58,8 +51,4 @@ func (cli *HTTPclient) Do() (resp *http.Response, err error) {
 
 	resp, err = cli.Socket.Do(req)
 	return
-}
-
-func (hhparam *HHvacancyQueryBody) SetSearchParams() {
-
 }

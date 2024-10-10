@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -17,7 +18,7 @@ func main() {
 	logger.Info("debug log stream status is run!")
 
 	cli := htpcli.HTTPclient{Socket: &http.Client{}}
-	resp, err := cli.NewGet("https://api.hh.ru/vacancies", map[string]string{"User-Agent": "HH-User-Agent"}).Do()
+	resp, err := cli.NewGet("https://api.hh.ru/vacancies?text=golang", map[string]string{"User-Agent": "HH-User-Agent"}).Do()
 	if err != nil {
 		logger.Debug(err.Error())
 	}
@@ -25,7 +26,15 @@ func main() {
 	if b, err := io.ReadAll(resp.Body); err != nil {
 		logger.Debug(err.Error())
 	} else {
-		fmt.Printf("%s", string(b))
+		rsp := htpcli.HHresponse{}
+		if err = json.Unmarshal(b, &rsp); err != nil {
+			logger.Debug(err.Error())
+		}
+		for _, v := range rsp.Items {
+			if v.Experience.ID == "noExperience" && v.Schedule.ID == "remote" {
+				fmt.Printf("%+v\n\n\n", v)
+			}
+		}
 	}
 
 }
