@@ -1,4 +1,4 @@
-module project
+module vacancydealer
 
 go 1.23.2
 

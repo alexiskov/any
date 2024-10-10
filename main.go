@@ -2,8 +2,9 @@ package main
 
 import (
 	"os"
-	"project/execute"
-	"project/logger"
+
+	"vacancydealer/hh"
+	"vacancydealer/logger"
 )
 
 func main() {
@@ -13,7 +14,7 @@ func main() {
 	logger.InitDebugJSONlog(os.Stdout)
 	logger.Info("debug log stream status is run!")
 
-	if err := execute.StartHH(); err != nil {
+	if err := hh.Start("golang", hh.REMOTE_JOB, hh.NO_EXPERIENCE); err != nil {
 		logger.Debug(err.Error())
 	}
 }
