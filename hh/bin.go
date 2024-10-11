@@ -2,7 +2,6 @@ package hh
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"vacancydealer/htpcli"
@@ -47,12 +46,5 @@ func SentRequest(vacancieName string, sched schedule, exp experience) (resp HHre
 			resp.Items = append(resp.Items, v)
 		}
 	}
-
-	//-----------------------------
-	for _, s := range resp.Items {
-		fmt.Printf("\n%+v\n", s)
-	}
-	//-----------------------------
-
 	return
 }
