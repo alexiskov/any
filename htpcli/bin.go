@@ -7,6 +7,12 @@ import (
 )
 
 type (
+	RequestDealer interface {
+		NewGet(url string, headers map[string]string) *HTTPclient
+		NewPost(url string, headers map[string]string, body []byte) *HTTPclient
+		Do() (resp *http.Response, err error)
+	}
+
 	HTTPclient struct {
 		Socket  *http.Client
 		Method  string

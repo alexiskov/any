@@ -2,6 +2,7 @@ package hh
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"vacancydealer/htpcli"
@@ -23,9 +24,9 @@ type (
 )
 
 // sent query to HH
-func sent(vacancieName string, sched schedule, exp experience) (err error) {
-	hh := htpcli.HTTPclient{Socket: &http.Client{}}
-	r, err := hh.NewGet("https://api.hh.ru/"+vacancieName+"?text=golang&period=1", map[string]string{"User-Agent": "HH-User-Agent"}).Do()
+func SentRequest(vacancieName string, sched schedule, exp experience) (err error) {
+	var hh htpcli.RequestDealer = &htpcli.HTTPclient{Socket: &http.Client{}}
+	r, err := hh.NewGet("https://api.hh.ru/vacancies?text="+vacancieName, map[string]string{"User-Agent": "HH-User-Agent"}).Do()
 	if err != nil {
 		return
 	}
@@ -46,6 +47,12 @@ func sent(vacancieName string, sched schedule, exp experience) (err error) {
 			resp.Items = append(resp.Items, v)
 		}
 	}
+
+	//-----------------------------
+	for _, s := range resp.Items {
+		fmt.Printf("\n%+v\n", s)
+	}
+	//-----------------------------
 
 	return
 }
