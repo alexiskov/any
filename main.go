@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"vacancydealer/hh"
@@ -14,5 +15,10 @@ func main() {
 	logger.InitDebugJSONlog(os.Stdout)
 	logger.Info("debug log stream status is run!")
 
-	hh.SentRequest("golang", hh.REMOTE_JOB, hh.NO_EXPERIENCE)
+	res, err := hh.SentRequest("golang", hh.REMOTE_JOB, hh.NO_EXPERIENCE)
+	if err != nil {
+		logger.Debug(err.Error())
+	}
+
+	fmt.Printf("\n%+v\n", res)
 }
