@@ -24,7 +24,7 @@ type (
 )
 
 // sent query to HH
-func SentRequest(vacancieName string, sched schedule, exp experience) (err error) {
+func SentRequest(vacancieName string, sched schedule, exp experience) (resp HHresponse, err error) {
 	var hh htpcli.RequestDealer = &htpcli.HTTPclient{Socket: &http.Client{}}
 	r, err := hh.NewGet("https://api.hh.ru/vacancies?text="+vacancieName, map[string]string{"User-Agent": "HH-User-Agent"}).Do()
 	if err != nil {
@@ -36,12 +36,12 @@ func SentRequest(vacancieName string, sched schedule, exp experience) (err error
 		return
 	}
 
-	rsp := htpcli.HHresponse{}
+	rsp := HHresponse{}
 	if err = json.Unmarshal(b, &rsp); err != nil {
 		return
 	}
 
-	resp := htpcli.HHresponse{}
+	//resp := htpcli.HHresponse{}
 	for _, v := range rsp.Items {
 		if v.Experience.ID == string(exp) && v.Schedule.ID == string(sched) {
 			resp.Items = append(resp.Items, v)
