@@ -20,10 +20,10 @@ func Info(info string) {
 	Log.InfoStream.Info(info)
 }
 
-func InitDebugJSONlog(w io.Writer) {
+func InitErrorJSONlog(w io.Writer) {
 	Log.DebugStream = slog.New(slog.NewJSONHandler(w, &slog.HandlerOptions{Level: slog.LevelDebug}))
 }
 
-func Debug(debug string) {
-	Log.DebugStream.Debug(debug)
+func Error(err string) {
+	Log.DebugStream.Error(err)
 }
