@@ -2,7 +2,10 @@ package hh
 
 type (
 	HHresponse struct {
-		Items []HHitem `json:"items"`
+		Items   []HHitem `json:"items"`
+		Found   int      `json:"found"`
+		Pages   int      `json:"pages"`
+		PerPage int      `json:"per_page"`
 	}
 	HHitem struct {
 		ID          string           `json:"id"`
