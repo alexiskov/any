@@ -12,6 +12,10 @@ type (
 	Configs struct {
 		WebServer *HTTPserver
 		DMS       *DataBase
+		Tbot      *TbotData
+	}
+	TbotData struct {
+		API string `env:"TGBOT_APIKEY"`
 	}
 	HTTPserver struct {
 		Port     int    `env:"HTTPSERVER_PORT"`
@@ -32,7 +36,7 @@ func LoadConfig() (c Configs, err error) {
 		err = fmt.Errorf("config loading -> env-file loading error: %w", err)
 		return
 	}
-	c = Configs{&HTTPserver{TimeZone: os.Getenv("HTTPSERVER_TIMEZONE")}, &DataBase{Host: os.Getenv("DB_HOST"), DBname: os.Getenv("DB_NAME"), User: os.Getenv("DB_USER"), Password: os.Getenv("DB_PASSWORD")}}
+	c = Configs{&HTTPserver{TimeZone: os.Getenv("HTTPSERVER_TIMEZONE")}, &DataBase{Host: os.Getenv("DB_HOST"), DBname: os.Getenv("DB_NAME"), User: os.Getenv("DB_USER"), Password: os.Getenv("DB_PASSWORD")}, &TbotData{API: os.Getenv("TGBOT_APIKEY")}}
 
 	if htpsport, err := strconv.Atoi(os.Getenv("HTTPSERVER_PORT")); err != nil {
 		err = fmt.Errorf("config field HTTPSERVER_PORT parse error: %w", err)

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"vacancydealer/htpcli"
 )
 
@@ -24,9 +25,12 @@ type (
 )
 
 // sent query to HH
-func SentRequest(vacancieName string, sched schedule, exp experience) (rsp HHresponse, err error) {
+func SentRequest(vacancieName string, sched schedule, exp experience, page int) (rsp HHresponse, err error) {
 	var hh htpcli.RequestDealer = &htpcli.HTTPclient{Socket: &http.Client{}}
-	urq := fmt.Sprintf("https://api.hh.ru/vacancies?text=%s&experience=%s&schedule=%s", vacancieName, exp, sched)
+	urq := fmt.Sprintf("https://api.hh.ru/vacancies?text=%s&experience=%s&schedule=%s&per_page=100", vacancieName, exp, sched)
+	if page != 0 {
+		urq += "&page=" + strconv.Itoa(page)
+	}
 	r, err := hh.NewGet(urq, map[string]string{"User-Agent": "HH-User-Agent"}).Do()
 	if err != nil {
 		return

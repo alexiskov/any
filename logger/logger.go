@@ -21,7 +21,7 @@ func Info(info string) {
 }
 
 func InitErrorJSONlog(w io.Writer) {
-	Log.DebugStream = slog.New(slog.NewJSONHandler(w, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	Log.DebugStream = slog.New(slog.NewJSONHandler(w, &slog.HandlerOptions{Level: slog.LevelError}))
 }
 
 func Error(err string) {
