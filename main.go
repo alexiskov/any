@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"vacancydealer/bd"
 	"vacancydealer/confreader"
 	"vacancydealer/hh"
 	"vacancydealer/logger"
@@ -21,10 +22,15 @@ func main() {
 	if err != nil {
 		logger.Error(err.Error())
 	}
-	logger.Info("\nconfigs loaded\n")
+	logger.Info("configs loaded")
 
-	go tgBot(conf.Tbot.API)
-	logger.Info("telegram bot-worker is run...")
+	if err = bd.Init(conf.DMS.Host, conf.DMS.User, conf.DMS.Password, conf.DMS.DBname, conf.DMS.Port, conf.DMS.SSLmode); err != nil {
+		logger.Error(err.Error())
+	}
+
+	if err = bd.Migrate(); err != nil {
+		logger.Error(err.Error())
+	}
 
 	res, err := hh.SentRequest("golang", hh.REMOTE_JOB, hh.NO_EXPERIENCE, 0)
 	if err != nil {
@@ -35,12 +41,8 @@ func main() {
 		fmt.Printf("\n%+v\n", vac)
 	}
 
-	for {
-	}
-}
-
-func tgBot(tgAPIkey string) {
-	if err := telebot.Run(tgAPIkey); err != nil {
+	if err := telebot.Run(conf.Tbot.API); err != nil {
 		logger.Error(err.Error())
+		return
 	}
 }
