@@ -90,6 +90,11 @@ func callbackProcessing(ctx context.Context, b *bot.Bot, update *models.Update) 
 				{{Text: "график работы", CallbackData: "#changeSchedule"}},
 			}},
 		})
+	case "changeVacancyName":
+		b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID:    update.CallbackQuery.From.ID,
+			ParseMode: models.ParseModeHTML,
+			Text:      "<b>назвние вакансие?</b>\n\nНазвание вакансии не обязательно должно быть полным. Поиск происходит по совпадению ключевых слов в названии вакансии. Допустимо указать одно слово в вакансии или полное название. Важно понимать, что работодатель указывает произвольное название.\n\nвведи ключевое слово для поиска вакансии"})
 	}
 }
 
