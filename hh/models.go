@@ -1,6 +1,7 @@
 package hh
 
 type (
+	// for hh vacancy annonce query
 	HHresponse struct {
 		Items   []HHitem `json:"items"`
 		Found   int      `json:"found"`
@@ -49,4 +50,21 @@ type (
 		ID   string `json:"id"`
 		Name string `json:"name"`
 	}
+
+	// for hh areas index query
+	Country struct {
+		ID      string   `json:"id"`
+		Name    string   `json:"name"`
+		Regions []Region `json:"areas"`
+	}
+	Region struct {
+		ID     string `json:"id"`
+		Name   string `json:"name"`
+		Cities []City `json:"areas"`
+	}
+	City struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	}
+	Countries []Country
 )

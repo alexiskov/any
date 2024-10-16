@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"vacancydealer/bd"
@@ -31,16 +30,15 @@ func main() {
 	if err = bd.Migrate(); err != nil {
 		logger.Error(err.Error())
 	}
+	logger.Info("database is Ready ...")
 
-	res, err := hh.SentRequest("golang", hh.REMOTE_JOB, hh.NO_EXPERIENCE, 0)
-	if err != nil {
+	if err = hh.Init(); err != nil {
 		logger.Error(err.Error())
+		return
 	}
+	logger.Info("hh worker is OK")
 
-	for _, vac := range res.Items {
-		fmt.Printf("\n%+v\n", vac)
-	}
-
+	logger.Info("telegram bot worker start")
 	if err := telebot.Run(conf.Tbot.API); err != nil {
 		logger.Error(err.Error())
 		return
