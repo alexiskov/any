@@ -22,6 +22,7 @@ func textHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	default:
 		if u, ok := UserStates[tgUID]; ok {
 			defer delete(UserStates, tgUID)
+
 			switch u.State {
 			case 1:
 				u.User.Vacancy = update.Message.Text
@@ -120,17 +121,15 @@ func callbackProcessing(ctx context.Context, b *bot.Bot, update *models.Update) 
 
 	switch update.CallbackQuery.Data {
 	case "#vacFilterWritePlease":
-		b.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID:    tgUID,
-			ParseMode: models.ParseModeHTML,
-			Text:      "<b>Что изменим?</b>\n\nНажми нужную кнопку.",
-			ReplyMarkup: linesButtonGenerate([][2]string{
-				{"профессия", "#changeVacancyName"},
-				{"регион", "#changeLocation"},
-				{"опыт работы", "#changeExperience"},
-				{"график работы", "#changeSchedule"},
-			}),
+		_, err := b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID:      tgUID,
+			ParseMode:   models.ParseModeHTML,
+			Text:        "<b>Что изменим?</b>\n\nНажми нужную кнопку.",
+			ReplyMarkup: &models.InlineKeyboardMarkup{InlineKeyboard: linesButtonGenerate([][2]string{{"профессия", "#changeVacancyName"}, {"регион", "#changeLocation"}, {"опыт работы", "#changeExperience"}, {"график работы", "#changeSchedule"}})},
 		})
+		if err != nil {
+			logger.Error(fmt.Errorf("filter write command handler error^ %w", err).Error())
+		}
 	case "#changeVacancyName":
 		_, err := b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:    tgUID,
@@ -151,15 +150,10 @@ func callbackProcessing(ctx context.Context, b *bot.Bot, update *models.Update) 
 		UserStates[tgUID] = state
 	case "#changeLocation":
 		_, err := b.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID:    tgUID,
-			ParseMode: models.ParseModeHTML,
-			Text:      "<b>Замена региона поиска вакансии</b>\n\nУточнить локацию поиска до:",
-			ReplyMarkup: &models.InlineKeyboardMarkup{InlineKeyboard: [][]models.InlineKeyboardButton{
-				{{Text: "страны", CallbackData: "#changeCountry"}},
-				{{Text: "региона", CallbackData: "#changeRegion"}},
-				{{Text: "населенного пункта", CallbackData: "#changeCity"}},
-				{{Text: "не имеет значения", CallbackData: "?setLocation:0"}},
-			}},
+			ChatID:      tgUID,
+			ParseMode:   models.ParseModeHTML,
+			Text:        "<b>Замена региона поиска вакансии</b>\n\nУточнить локацию поиска до:",
+			ReplyMarkup: &models.InlineKeyboardMarkup{InlineKeyboard: linesButtonGenerate([][2]string{{"страны", "#changeCountry"}, {"региона", "#changeRegion"}, {"населенного пункта", "#changeCity"}, {"не имеет значения", "?setLocation:0"}})},
 		})
 		if err != nil {
 			logger.Error(fmt.Errorf("change city name function, to user %d have a error: %w", tgUID, err).Error())
