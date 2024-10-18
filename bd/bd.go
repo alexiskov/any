@@ -3,6 +3,7 @@ package bd
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -78,19 +79,25 @@ func (u UserData) Update() (err error) {
 		err = fmt.Errorf("update user data error: %w", err)
 		return
 	}
-	sqlu.Location = u.Location
 	sqlu.ExperienceYear = u.ExperienceYear
 	sqlu.Schedule = u.Schedule
 	sqlu.VacancyName = u.VacancyName
-	if err = DB.Socket.Save(&sqlu).Error; err != nil {
+	if err = DB.Socket.Model(&sqlu).Select("schedule", "vacancy_name", "experience_year").Updates(UserData{Schedule: sqlu.Schedule, VacancyName: sqlu.VacancyName, ExperienceYear: sqlu.ExperienceYear}).Error; err != nil {
 		err = fmt.Errorf("updating userData error: %w", err)
 		return
 	}
 	return nil
 }
 
+func (u UserData) UpdateLocation() (err error) {
+	if err = DB.Socket.Model(&u).Where("tg_id=?", u.TgID).Update("location", u.Location).Error; err != nil {
+		err = fmt.Errorf("user data location on db update error: %w", err)
+	}
+	return
+}
+
 func FindCitiesByName(cityName string) (cities Cities, err error) {
-	if err = DB.Socket.Where("name like ?", "%"+cityName+"%").Find(&cities).Error; err != nil {
+	if err = DB.Socket.Where("LOWER(name) like ?", "%"+strings.ToLower(cityName)+"%").Find(&cities).Error; err != nil {
 		err = fmt.Errorf("cities by name finding error: %w", err)
 		return
 	}
@@ -131,7 +138,7 @@ func FindCitiesByName(cityName string) (cities Cities, err error) {
 }
 
 func FindRegionByName(regionName string) (regions Regions, err error) {
-	if err = DB.Socket.Where("name like ?", "%"+regionName+"%").Find(&regions).Error; err != nil {
+	if err = DB.Socket.Where("LOWER(name) like ?", "%"+strings.ToLower(regionName)+"%").Find(&regions).Error; err != nil {
 		err = fmt.Errorf("Find region by name error: %w", err)
 		return
 	}
@@ -159,6 +166,45 @@ func FindRegionByName(regionName string) (regions Regions, err error) {
 func FindCountries() (countries Countries, err error) {
 	if err = DB.Socket.Find(&countries).Error; err != nil {
 		err = fmt.Errorf("countries finding error: %w", err)
+	}
+	return
+}
+
+// Поиск локации по ИД
+// Проверяет ИД по порядку в таблицах: стран, регионов, населенных пунктов
+func FindLocByID(locID uint) (locName string, err error) {
+	locName = "не имеет значения"
+	country := Country{}
+	if err = DB.Socket.Where("id=?", locID).First(&country).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			region := Region{}
+			if err = DB.Socket.Where("id=?", locID).First(&region).Error; err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					city := City{}
+					if err = DB.Socket.Where("id=?", locID).First(&city).Error; err != nil {
+						if !errors.Is(err, gorm.ErrRecordNotFound) {
+							err = fmt.Errorf("location by ID finding error: %w", err)
+							return
+						}
+					} else {
+						locName = city.Name
+					}
+				} else {
+					err = fmt.Errorf("location by ID finding error: %w", err)
+					return
+				}
+
+			} else {
+				locName = region.Name
+			}
+
+		} else {
+			err = fmt.Errorf("location by ID finding error: %w", err)
+			return
+		}
+
+	} else {
+		locName = country.Name
 	}
 	return
 }

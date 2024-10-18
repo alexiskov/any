@@ -81,7 +81,7 @@ func (countries Countries) CreateToDB() (err error) {
 
 	re, err := regexp.Compile(`\(.*\)`)
 	if err != nil {
-		fmt.Println("Ошибка при компиляции регулярного выражения:", err)
+		err = fmt.Errorf("Create logations on DB -> regxp pattern compilation error: %w", err)
 		return err
 	}
 
@@ -100,18 +100,22 @@ func (countries Countries) CreateToDB() (err error) {
 				return err
 			}
 			rgxRegion := re.ReplaceAllString(region.Name, "")
-			sqlregions = append(sqlregions, bd.Region{ID: uint(ri), Name: rgxRegion, Owner: uint(coi)})
+			if len(region.Cities) != 0 {
+				sqlregions = append(sqlregions, bd.Region{ID: uint(ri), Name: rgxRegion, Owner: uint(coi)})
+				for _, city := range region.Cities {
+					ci, err := strconv.Atoi(city.ID)
+					if err != nil {
+						err = fmt.Errorf("regions on DB create, region id parse error: %w", err)
+						return err
+					}
 
-			for _, city := range region.Cities {
-				ci, err := strconv.Atoi(city.ID)
-				if err != nil {
-					err = fmt.Errorf("regions on DB create, region id parse error: %w", err)
-					return err
+					rgxCity := re.ReplaceAllString(city.Name, "")
+					sqlcities = append(sqlcities, bd.City{ID: uint(ci), Name: rgxCity, Owner: uint(ri)})
 				}
-
-				rgxCity := re.ReplaceAllString(city.Name, "")
-				sqlcities = append(sqlcities, bd.City{ID: uint(ci), Name: rgxCity, Owner: uint(ri)})
+			} else {
+				sqlcities = append(sqlcities, bd.City{ID: uint(ri), Name: region.Name, Owner: uint(coi)})
 			}
+
 		}
 	}
 
