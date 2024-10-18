@@ -113,11 +113,3 @@ func convertUserModelDBtoTG(sqluser bd.UserData) (ud UserData) {
 	}
 	return
 }
-
-// ------------------------------------------------------------------------->>>BUTTON GENERATOR---------------------------------------------------------------
-func linesButtonGenerate(buttonsData [][2]string) (inlineButtons [][]models.InlineKeyboardButton) {
-	for _, lb := range buttonsData {
-		inlineButtons = append(inlineButtons, []models.InlineKeyboardButton{{Text: lb[0], CallbackData: lb[1]}})
-	}
-	return
-}
