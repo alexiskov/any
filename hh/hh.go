@@ -160,3 +160,20 @@ func (from ScheduleData) SchedulesModelConvert() (to bd.Schedules) {
 	}
 	return
 }
+
+func makeFilterData(userdata []bd.UserData) (userFilterList []UserFilter) {
+	for _, bdUd := range userdata {
+		userFilterTemp := UserFilter{TgID: bdUd.TgID, Vacancyname: bdUd.VacancyName, Location: int(bdUd.Location), Schedule: bdUd.Schedule}
+		if bdUd.ExperienceYear < 1 {
+			userFilterTemp.Experience = "noExperience"
+		} else if bdUd.ExperienceYear > 0 && bdUd.ExperienceYear < 4 {
+			userFilterTemp.Experience = "between1And3"
+		} else if bdUd.ExperienceYear > 3 && bdUd.ExperienceYear < 7 {
+			userFilterTemp.Experience = "between3And6"
+		} else if bdUd.ExperienceYear > 6 {
+			userFilterTemp.Experience = "moreThan6"
+		}
+		userFilterList = append(userFilterList, userFilterTemp)
+	}
+	return
+}

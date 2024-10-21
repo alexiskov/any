@@ -237,3 +237,10 @@ func GetSchedules(scheduleID string) (schdules Schedules, err error) {
 	}
 	return
 }
+
+func GetAllUsers() (users []UserData, err error) {
+	if err = DB.Socket.Find(&users).Error; err != nil {
+		err = fmt.Errorf("all users select error: %w", err)
+	}
+	return
+}

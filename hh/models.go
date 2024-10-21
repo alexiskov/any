@@ -76,4 +76,13 @@ type (
 		Id   string `json:"id"`
 		Name string `json:"name"`
 	}
+
+	//UserFilter data
+	UserFilter struct {
+		TgID        int64
+		Vacancyname string
+		Experience  string
+		Schedule    string
+		Location    int
+	}
 )
