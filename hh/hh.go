@@ -17,9 +17,9 @@ type (
 )
 
 // sent query to HH
-func GetVacancy(name string, sched schedule, exp experience, page int) (rsp HHresponse, err error) {
+func (dataFilter UserFilter) GetVacancy(page int) (rsp HHresponse, err error) {
 	var hh htpcli.RequestDealer = &htpcli.HTTPclient{Socket: &http.Client{}}
-	urq := fmt.Sprintf("https://api.hh.ru/vacancies?text=%s&experience=%s&schedule=%s&applicant_comments_order=creation_time_desc&per_page=100", name, exp, sched)
+	urq := fmt.Sprintf("https://api.hh.ru/vacancies?text=%s&experience=%s&schedule=%s&applicant_comments_order=creation_time_desc&per_page=100", dataFilter.Vacancyname, dataFilter.Experience, dataFilter.Schedule)
 	if page != 0 {
 		urq += "&page=" + strconv.Itoa(page)
 	}
