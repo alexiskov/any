@@ -16,7 +16,7 @@ type (
 		TgID           int64 `gorm:"uniqueIndex"`
 		VacancyName    string
 		ExperienceYear int
-		Schedule       int
+		Schedule       string
 		Location       uint
 	}
 	JobAnnounce struct {
@@ -58,4 +58,11 @@ type (
 	Countries []Country
 	Regions   []Region
 	Cities    []City
+
+	Schedule struct {
+		HhID string `gorm:"primaryKey"`
+		Name string
+	}
+
+	Schedules []Schedule
 )

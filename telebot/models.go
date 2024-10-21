@@ -16,4 +16,9 @@ type (
 		User  UserData
 		Date  time.Time
 	}
+
+	ScheduleType struct {
+		Name  string
+		Valie int
+	}
 )

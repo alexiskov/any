@@ -67,4 +67,13 @@ type (
 		Name string `json:"name"`
 	}
 	Countries []Country
+
+	// for hh vacancy params
+	ScheduleData struct {
+		List []Schedule `json:"schedule"`
+	}
+	Schedule struct {
+		Id   string `json:"id"`
+		Name string `json:"name"`
+	}
 )

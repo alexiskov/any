@@ -13,7 +13,8 @@ import (
 )
 
 var (
-	UserStates map[int64]UserStateData
+	UserStates     map[int64]UserStateData
+	SCHEDULE_TYPES = []ScheduleType{{"удаленная работа", 1}, {"полная занятость", 2}}
 )
 
 // Start tgelegram-Bot worker
@@ -27,6 +28,7 @@ func Run(tgAPI string) (err error) {
 		bot.WithMessageTextHandler("", bot.MatchTypeContains, textHandler),
 		bot.WithCallbackQueryDataHandler("#", bot.MatchTypePrefix, callbackProcessing),
 		bot.WithCallbackQueryDataHandler("?setLocation:", bot.MatchTypePrefix, locationSetter),
+		bot.WithCallbackQueryDataHandler("?changeSched:", bot.MatchTypePrefix, scheduleSetter),
 	}
 
 	b, err := bot.New(tgAPI, opts...)
@@ -73,13 +75,6 @@ func sentUserDataToClient(ctx context.Context, tgID int64, b *bot.Bot) (err erro
 //-------------------------------------MODEL CONVERTERS-----------------------------------
 
 func (ud UserData) convertUserModelTGtoDB() (sqluser bd.UserData) {
-	switch ud.Schedule {
-	case "удаленная работа":
-		sqluser.Schedule = 1
-	default:
-		sqluser.Schedule = 0
-	}
-
 	sqluser.TgID = ud.TgID
 	sqluser.VacancyName = ud.Vacancy
 	sqluser.ExperienceYear = ud.ExperienceYears
@@ -101,12 +96,8 @@ func convertUserModelDBtoTG(sqluser bd.UserData) (ud UserData) {
 		}
 	}
 
-	switch sqluser.Schedule {
-	case 1:
-		ud.Schedule = "удаленная работа"
-	default:
-		ud.Schedule = "не выбрано"
-	}
+	res, _ := bd.GetSchedules(sqluser.Schedule)
+	ud.Schedule = res[0].Name
 
 	if sqluser.VacancyName == "" {
 		ud.Vacancy = "не указано"

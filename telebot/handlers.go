@@ -240,7 +240,29 @@ func callbackProcessing(ctx context.Context, b *bot.Bot, update *models.Update) 
 			return
 		}
 		UserStates[tgUID] = state
+	case "#changeSchedule":
 
+		sch, err := bd.GetSchedules("")
+		if err != nil {
+			logger.Error(err.Error())
+			return
+		}
+		schedulesButtonsData := make([][2]string, 0)
+
+		for _, s := range sch {
+			schedulesButtonsData = append(schedulesButtonsData, [2]string{s.Name, "?changeSched:" + s.HhID})
+		}
+
+		_, err = b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID:      tgUID,
+			ParseMode:   models.ParseModeHTML,
+			Text:        "<b>График работы</b>\n\nВыберите график работы по искомой вакансии",
+			ReplyMarkup: &models.InlineKeyboardMarkup{InlineKeyboard: linesButtonGenerate(schedulesButtonsData)}},
+		)
+		if err != nil {
+			logger.Error(fmt.Errorf("change vacancy name function, to user %d have a error: %w", tgUID, err).Error())
+			return
+		}
 	}
 
 }
@@ -254,6 +276,7 @@ func locationSetter(ctx context.Context, b *bot.Bot, update *models.Update) {
 	}
 	u, err := findRegisterUser(tgUID)
 	if err != nil {
+		logger.Error(err.Error())
 		return
 	}
 
@@ -264,6 +287,26 @@ func locationSetter(ctx context.Context, b *bot.Bot, update *models.Update) {
 	}
 
 	sentUserDataToClient(ctx, tgUID, b)
+}
+
+// Set schedule handler
+func scheduleSetter(ctx context.Context, b *bot.Bot, update *models.Update) {
+	tgUID := update.CallbackQuery.From.ID
+	u, err := findRegisterUser(tgUID)
+	if err != nil {
+		logger.Error(err.Error())
+		return
+	}
+
+	sqluser := u.convertUserModelTGtoDB()
+	sqluser.Schedule = strings.Replace(update.CallbackQuery.Data, "?changeSched:", "", 1)
+	if err = sqluser.UpdateSchedule(); err != nil {
+		logger.Error(err.Error())
+	}
+	if err = sentUserDataToClient(ctx, tgUID, b); err != nil {
+		logger.Error(err.Error())
+		return
+	}
 }
 
 // --------------------------------------------------------------------------------------<<<HANDLERS------------------------------------------------------------------------------

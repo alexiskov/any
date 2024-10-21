@@ -24,7 +24,7 @@ func Init(host, user, password, dbname string, port int, sslmode string) (err er
 }
 
 func Migrate() (err error) {
-	if err = DB.Socket.AutoMigrate(UserData{}, JobAnnounce{}, UserPivotVacancy{}, Country{}, Region{}, City{}); err != nil {
+	if err = DB.Socket.AutoMigrate(UserData{}, JobAnnounce{}, UserPivotVacancy{}, Country{}, Region{}, City{}, Schedule{}); err != nil {
 		err = fmt.Errorf("database automigration error: %w", err)
 	}
 	return
@@ -82,7 +82,7 @@ func (u UserData) Update() (err error) {
 	sqlu.ExperienceYear = u.ExperienceYear
 	sqlu.Schedule = u.Schedule
 	sqlu.VacancyName = u.VacancyName
-	if err = DB.Socket.Model(&sqlu).Select("schedule", "vacancy_name", "experience_year").Updates(UserData{Schedule: sqlu.Schedule, VacancyName: sqlu.VacancyName, ExperienceYear: sqlu.ExperienceYear}).Error; err != nil {
+	if err = DB.Socket.Model(&sqlu).Select("vacancy_name", "experience_year").Updates(UserData{VacancyName: sqlu.VacancyName, ExperienceYear: sqlu.ExperienceYear}).Error; err != nil {
 		err = fmt.Errorf("updating userData error: %w", err)
 		return
 	}
@@ -92,6 +92,13 @@ func (u UserData) Update() (err error) {
 func (u UserData) UpdateLocation() (err error) {
 	if err = DB.Socket.Model(&u).Where("tg_id=?", u.TgID).Update("location", u.Location).Error; err != nil {
 		err = fmt.Errorf("user data location on db update error: %w", err)
+	}
+	return
+}
+
+func (u UserData) UpdateSchedule() (err error) {
+	if err = DB.Socket.Model(&u).Where("tg_id=?", u.TgID).Update("schedule", u.Schedule).Error; err != nil {
+		err = fmt.Errorf("user data schedule field in db update error:%w", err)
 	}
 	return
 }
@@ -205,6 +212,28 @@ func FindLocByID(locID uint) (locName string, err error) {
 
 	} else {
 		locName = country.Name
+	}
+	return
+}
+
+// schedules list  in DB create or update
+func (sch Schedules) CreateToDB() (err error) {
+	if err = DB.Socket.Save(&sch).Error; err != nil {
+		err = fmt.Errorf("schedule of vacancie annonce create error: %w", err)
+	}
+	return
+}
+
+// shedules finding
+func GetSchedules(scheduleID string) (schdules Schedules, err error) {
+	if len(scheduleID) == 0 {
+		if err = DB.Socket.Find(&schdules).Error; err != nil {
+			return
+		}
+	} else {
+		if err = DB.Socket.Where("hh_id=?", scheduleID).First(&schdules).Error; err != nil {
+			return
+		}
 	}
 	return
 }

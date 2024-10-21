@@ -11,16 +11,6 @@ import (
 	"vacancydealer/htpcli"
 )
 
-const (
-	//Experience values HH
-	NO_EXPERIENCE   experience = "noExperience"
-	BETWEN_1_3_YEAR experience = "between1And3"
-	BETWEN_3_6_YEAR experience = "between3And6"
-
-	//Schedule values HH
-	REMOTE_JOB schedule = "remote"
-)
-
 type (
 	experience string
 	schedule   string
@@ -54,7 +44,20 @@ func Init() (err error) {
 	if err != nil {
 		return
 	}
-	return r.CreateToDB()
+
+	if err = r.CreateToDB(); err != nil {
+		return
+	}
+
+	sch, err := GetSchedulesList()
+	if err != nil {
+		return
+	}
+	if err = sch.SchedulesModelConvert().CreateToDB(); err != nil {
+		return
+	}
+
+	return nil
 }
 
 func getAreas() (rsp Countries, err error) {
@@ -130,4 +133,30 @@ func (countries Countries) CreateToDB() (err error) {
 	}
 
 	return nil
+}
+
+func GetSchedulesList() (rsp ScheduleData, err error) {
+	var hh htpcli.RequestDealer = &htpcli.HTTPclient{Socket: &http.Client{}}
+	urq := "https://api.hh.ru/dictionaries"
+	r, err := hh.NewGet(urq, map[string]string{"User-Agent": "HH-User-Agent"}).Do()
+	if err != nil {
+		return
+	}
+	b, err := io.ReadAll(r.Body)
+	if err != nil {
+		return
+	}
+
+	if err = json.Unmarshal(b, &rsp); err != nil {
+		return
+	}
+	return
+}
+
+// package HH model to model of DB package convert
+func (from ScheduleData) SchedulesModelConvert() (to bd.Schedules) {
+	for _, s := range from.List {
+		to = append(to, bd.Schedule{HhID: s.Id, Name: s.Name})
+	}
+	return
 }
