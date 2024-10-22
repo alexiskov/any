@@ -88,7 +88,7 @@ func (ja JobAnnounce) sentJobAnnounceToClient(ctx context.Context, tgID int64, b
 	return nil
 }
 
-//-------------------------------------MODEL CONVERTERS-----------------------------------
+//------------------------------------->>>MODEL CONVERTERS-----------------------------------
 
 func (ud UserData) convertUserModelTGtoDB() (sqluser bd.UserData) {
 	sqluser.TgID = ud.TgID
@@ -127,3 +127,5 @@ func convertJobDataModelDBtoTG(jobSQLdata []bd.JobAnnounce) (ja []JobAnnounce) {
 	}
 	return
 }
+
+//-------------------------------------<<<MODEL CONVERTERS-----------------------------------
