@@ -25,8 +25,8 @@ type (
 		Name           string
 		Expierence     string
 		SalaryGross    bool
-		SalaryFrom     int
-		SalaryTo       int
+		SalaryFrom     float64
+		SalaryTo       float64
 		SalaryCurrency string
 		PublishedAt    int64
 		Schedule       string

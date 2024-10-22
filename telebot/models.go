@@ -21,4 +21,18 @@ type (
 		Name  string
 		Valie int
 	}
+
+	JobAnnounce struct {
+		Name           string
+		Expierence     string
+		SalaryGross    bool
+		SalaryFrom     float64
+		SalaryTo       float64
+		SalaryCurrency string
+		PublishedAt    int64
+		Schedule       string
+		Requirement    string
+		Responsebility string
+		Link           string
+	}
 )

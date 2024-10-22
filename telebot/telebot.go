@@ -72,6 +72,22 @@ func sentUserDataToClient(ctx context.Context, tgID int64, b *bot.Bot) (err erro
 	return nil
 }
 
+func (ja JobAnnounce) sentJobAnnounceToClient(ctx context.Context, tgID int64, b *bot.Bot) (err error) {
+	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID:    tgID,
+		ParseMode: models.ParseModeHTML,
+		Text:      fmt.Sprintf("<b> <u>%s</u> </b>\n\n<b>Требуемый опыт: </b><i> %s</i>\n<b>Зп указана до уплаты налогов: </b>%t\n<b>Размер ЗП:</b>%.2f - %.2f%s\n<b>Графика работы: </b>%s", ja.Name, ja.Expierence, ja.SalaryGross, ja.SalaryFrom, ja.SalaryTo, ja.SalaryCurrency, ja.Schedule),
+		ReplyMarkup: &models.InlineKeyboardMarkup{InlineKeyboard: [][]models.InlineKeyboardButton{
+			{{Text: "источник", URL: ja.Link}},
+		}},
+	})
+	if err != nil {
+		err = fmt.Errorf("sentJobAnnounceTo client error: %w", err)
+		return
+	}
+	return nil
+}
+
 //-------------------------------------MODEL CONVERTERS-----------------------------------
 
 func (ud UserData) convertUserModelTGtoDB() (sqluser bd.UserData) {
@@ -101,6 +117,13 @@ func convertUserModelDBtoTG(sqluser bd.UserData) (ud UserData) {
 
 	if sqluser.VacancyName == "" {
 		ud.Vacancy = "не указано"
+	}
+	return
+}
+
+func convertJobDataModelDBtoTG(jobSQLdata []bd.JobAnnounce) (ja []JobAnnounce) {
+	for _, sj := range jobSQLdata {
+		ja = append(ja, JobAnnounce{Name: sj.Name, Expierence: sj.Expierence, SalaryGross: sj.SalaryGross, SalaryFrom: sj.SalaryFrom, SalaryTo: sj.SalaryTo, SalaryCurrency: sj.SalaryCurrency, PublishedAt: sj.PublishedAt, Schedule: sj.Schedule, Requirement: sj.Requirement, Responsebility: sj.Responsebility, Link: sj.Link})
 	}
 	return
 }
