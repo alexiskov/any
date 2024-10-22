@@ -16,29 +16,6 @@ type (
 	schedule   string
 )
 
-// sent query to HH
-func (dataFilter UserFilter) GetVacancy(page int) (rsp HHresponse, err error) {
-	var hh htpcli.RequestDealer = &htpcli.HTTPclient{Socket: &http.Client{}}
-	urq := fmt.Sprintf("https://api.hh.ru/vacancies?text=%s&experience=%s&schedule=%s&applicant_comments_order=creation_time_desc&per_page=100", dataFilter.Vacancyname, dataFilter.Experience, dataFilter.Schedule)
-	if page != 0 {
-		urq += "&page=" + strconv.Itoa(page)
-	}
-	r, err := hh.NewGet(urq, map[string]string{"User-Agent": "HH-User-Agent"}).Do()
-	if err != nil {
-		return
-	}
-
-	b, err := io.ReadAll(r.Body)
-	if err != nil {
-		return
-	}
-
-	if err = json.Unmarshal(b, &rsp); err != nil {
-		return
-	}
-	return
-}
-
 func Init() (err error) {
 	r, err := getAreas()
 	if err != nil {
@@ -58,6 +35,29 @@ func Init() (err error) {
 	}
 
 	return nil
+}
+
+// sent query to HH
+func (dataFilter UserFilter) GetVacancies(page int) (rsp HHresponse, err error) {
+	var hh htpcli.RequestDealer = &htpcli.HTTPclient{Socket: &http.Client{}}
+	urq := fmt.Sprintf("https://api.hh.ru/vacancies?text=%s&experience=%s&schedule=%s&applicant_comments_order=creation_time_desc&per_page=100", dataFilter.Vacancyname, dataFilter.Experience, dataFilter.Schedule)
+	if page != 0 {
+		urq += "&page=" + strconv.Itoa(page)
+	}
+	r, err := hh.NewGet(urq, map[string]string{"User-Agent": "HH-User-Agent"}).Do()
+	if err != nil {
+		return
+	}
+
+	b, err := io.ReadAll(r.Body)
+	if err != nil {
+		return
+	}
+
+	if err = json.Unmarshal(b, &rsp); err != nil {
+		return
+	}
+	return
 }
 
 func getAreas() (rsp Countries, err error) {
