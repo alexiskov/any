@@ -45,9 +45,16 @@ func Init() (err error) {
 // sent query to HH
 func (dataFilter UserFilter) GetVacancies(pp, page int) (rsp HHresponse, err error) {
 	var hh htpcli.RequestDealer = &htpcli.HTTPclient{Socket: &http.Client{}}
-	urq := fmt.Sprintf("https://api.hh.ru/vacancies?text=%s&experience=%s&schedule=%s&applicant_comments_order=creation_time_desc&per_page=%d", dataFilter.Vacancyname, dataFilter.Experience, dataFilter.Schedule, pp)
+	urq := fmt.Sprintf("https://api.hh.ru/vacancies?&experience=%s&schedule=%s&search_field=name&applicant_comments_order=creation_time_desc&per_page=%d", dataFilter.Experience, dataFilter.Schedule, pp)
+	if dataFilter.Vacancyname != "" {
+		urq += "&text=NAME%3A(" + dataFilter.Vacancyname + ")"
+	}
+
 	if page != 0 {
 		urq += "&page=" + strconv.Itoa(page)
+	}
+	if dataFilter.Location != 0 {
+		urq += "&area=" + strconv.Itoa(dataFilter.Location)
 	}
 	r, err := hh.NewGet(urq, map[string]string{"User-Agent": "HH-User-Agent"}).Do()
 	if err != nil {
