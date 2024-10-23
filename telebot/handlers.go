@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 	"vacancydealer/bd"
+	"vacancydealer/hh"
 	"vacancydealer/logger"
 
 	"github.com/go-telegram/bot"
@@ -262,6 +263,27 @@ func callbackProcessing(ctx context.Context, b *bot.Bot, update *models.Update) 
 		if err != nil {
 			logger.Error(fmt.Errorf("change vacancy name function, to user %d have a error: %w", tgUID, err).Error())
 			return
+		}
+	case "#showLast10Vac":
+		squ, err := bd.FindOrCreateUser(tgUID)
+		if err != nil {
+			logger.Error(err.Error())
+			return
+		}
+
+		for _, f := range hh.GetUserData([]bd.UserData{squ}) {
+			res, err := f.GetVacancies(10, 0)
+			if err != nil {
+				logger.Error(err.Error())
+				return
+			}
+
+			for _, j := range convertAnnounceHHtoTG(res) {
+				if err = j.sentJobAnnounceToClient(ctx, tgUID, b); err != nil {
+					logger.Error(err.Error())
+					continue
+				}
+			}
 		}
 	}
 

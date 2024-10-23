@@ -1,0 +1,11 @@
+syntax="proto3";
+
+package filter.data;
+
+message UserFilter{
+  int64 telegram_chat_id=1;
+  string vacancy_name=2;
+  string experience=3;
+  string schedule=4;
+  int location=5;
+}

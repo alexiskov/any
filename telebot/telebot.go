@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"vacancydealer/bd"
+	"vacancydealer/hh"
 	"vacancydealer/logger"
 
 	"github.com/go-telegram/bot"
@@ -63,6 +64,7 @@ func sentUserDataToClient(ctx context.Context, tgID int64, b *bot.Bot) (err erro
 		Text:      fmt.Sprintf("<b> <u>Поиск вакансий</u> </b>\n\n<b>Профессия: </b><i> %s</i>\n<b>Регион: </b><i> %s</i>\n<b>Опыт работы(лет): </b> %d\n<b>График работы: </b> <i> %s</i>", ud.Vacancy, ud.Location, ud.ExperienceYears, ud.Schedule),
 		ReplyMarkup: &models.InlineKeyboardMarkup{InlineKeyboard: [][]models.InlineKeyboardButton{
 			{{Text: "редактировать", CallbackData: "#vacFilterWritePlease"}},
+			{{Text: "показать последние 10", CallbackData: "#showLast10Vac"}},
 		}},
 	})
 	if err != nil {
@@ -124,6 +126,13 @@ func convertUserModelDBtoTG(sqluser bd.UserData) (ud UserData) {
 func convertJobDataModelDBtoTG(jobSQLdata []bd.JobAnnounce) (ja []JobAnnounce) {
 	for _, sj := range jobSQLdata {
 		ja = append(ja, JobAnnounce{Name: sj.Name, Expierence: sj.Expierence, SalaryGross: sj.SalaryGross, SalaryFrom: sj.SalaryFrom, SalaryTo: sj.SalaryTo, SalaryCurrency: sj.SalaryCurrency, PublishedAt: sj.PublishedAt, Schedule: sj.Schedule, Requirement: sj.Requirement, Responsebility: sj.Responsebility, Link: sj.Link})
+	}
+	return
+}
+
+func convertAnnounceHHtoTG(hhja hh.HHresponse) (ja []JobAnnounce) {
+	for _, ha := range hhja.Items {
+		ja = append(ja, JobAnnounce{Name: ha.Name, Expierence: ha.Experience.Name, SalaryGross: ha.Salary.Gross, SalaryFrom: ha.Salary.From, SalaryTo: ha.Salary.To, SalaryCurrency: ha.Salary.Currency, PublishedAt: ha.PublishedAt, Schedule: ha.Schedule.Name, Requirement: ha.Snippet.Requirement, Responsebility: ha.Snippet.Responsibility, Link: ha.PageURL})
 	}
 	return
 }

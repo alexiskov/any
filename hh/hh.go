@@ -2,6 +2,7 @@ package hh
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,6 +15,10 @@ import (
 type (
 	experience string
 	schedule   string
+)
+
+var (
+	StatusBadRequest = errors.New("status BadRequest")
 )
 
 func Init() (err error) {
@@ -38,14 +43,20 @@ func Init() (err error) {
 }
 
 // sent query to HH
-func (dataFilter UserFilter) GetVacancies(page int) (rsp HHresponse, err error) {
+func (dataFilter UserFilter) GetVacancies(pp, page int) (rsp HHresponse, err error) {
 	var hh htpcli.RequestDealer = &htpcli.HTTPclient{Socket: &http.Client{}}
-	urq := fmt.Sprintf("https://api.hh.ru/vacancies?text=%s&experience=%s&schedule=%s&applicant_comments_order=creation_time_desc&per_page=100", dataFilter.Vacancyname, dataFilter.Experience, dataFilter.Schedule)
+	urq := fmt.Sprintf("https://api.hh.ru/vacancies?text=%s&experience=%s&schedule=%s&applicant_comments_order=creation_time_desc&per_page=%d", dataFilter.Vacancyname, dataFilter.Experience, dataFilter.Schedule, pp)
 	if page != 0 {
 		urq += "&page=" + strconv.Itoa(page)
 	}
 	r, err := hh.NewGet(urq, map[string]string{"User-Agent": "HH-User-Agent"}).Do()
 	if err != nil {
+		return
+	}
+
+	switch r.StatusCode {
+	case http.StatusBadRequest:
+		err = StatusBadRequest
 		return
 	}
 
@@ -161,7 +172,7 @@ func (from ScheduleData) SchedulesModelConvert() (to bd.Schedules) {
 	return
 }
 
-func makeFilterData(userdata []bd.UserData) (userFilterList []UserFilter) {
+func GetUserData(userdata []bd.UserData) (userFilterList []UserFilter) {
 	for _, bdUd := range userdata {
 		userFilterTemp := UserFilter{TgID: bdUd.TgID, Vacancyname: bdUd.VacancyName, Location: int(bdUd.Location), Schedule: bdUd.Schedule}
 		if bdUd.ExperienceYear < 1 {

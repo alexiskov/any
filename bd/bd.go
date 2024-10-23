@@ -60,6 +60,7 @@ func FindOrCreateUser(tgID int64) (u UserData, err error) {
 	if err = DB.Socket.Where("tg_id=?", tgID).First(&u).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			u.TgID = tgID
+			u.Schedule = "fullDay"
 			if err = DB.Socket.Create(&u).Error; err != nil {
 				err = fmt.Errorf("user creating error: %w", err)
 			}

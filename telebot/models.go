@@ -29,7 +29,7 @@ type (
 		SalaryFrom     float64
 		SalaryTo       float64
 		SalaryCurrency string
-		PublishedAt    int64
+		PublishedAt    string
 		Schedule       string
 		Requirement    string
 		Responsebility string

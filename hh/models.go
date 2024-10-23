@@ -85,4 +85,8 @@ type (
 		Schedule    string
 		Location    int
 	}
+
+	HHfilterData struct {
+		VacancyNamePattern string
+	}
 )
