@@ -271,7 +271,7 @@ func callbackProcessing(ctx context.Context, b *bot.Bot, update *models.Update) 
 			return
 		}
 
-		for _, f := range hh.GetUserData([]bd.UserData{squ}) {
+		for _, f := range hh.ConvertUserData([]bd.UserData{squ}) {
 			res, err := f.GetVacancies(10, 0)
 			if err != nil {
 				logger.Error(err.Error())

@@ -87,6 +87,6 @@ type (
 	}
 
 	HHfilterData struct {
-		VacancyNamePattern string
+		VacancyName string
 	}
 )

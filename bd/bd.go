@@ -24,7 +24,7 @@ func Init(host, user, password, dbname string, port int, sslmode string) (err er
 }
 
 func Migrate() (err error) {
-	if err = DB.Socket.AutoMigrate(UserData{}, JobAnnounce{}, UserPivotVacancy{}, Country{}, Region{}, City{}, Schedule{}); err != nil {
+	if err = DB.Socket.AutoMigrate(UserData{}, JobAnnounce{}, UserPivotVacancy{}, Country{}, Region{}, City{}, Schedule{}, VacancynameSearchPattern{}); err != nil {
 		err = fmt.Errorf("database automigration error: %w", err)
 	}
 	return
@@ -245,3 +245,13 @@ func GetAllUsers() (users []UserData, err error) {
 	}
 	return
 }
+
+// -------------------------------------------------------<<<JobData-----------------------
+func (ja JobAnnounces) Save() (err error) {
+	if err = DB.Socket.Save(&ja).Error; err != nil {
+		err = fmt.Errorf("job announces update error: %w", err)
+	}
+	return
+}
+
+//------------------------------------------------------->>>JobData-----------------------

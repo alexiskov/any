@@ -45,7 +45,7 @@ func Init() (err error) {
 // sent query to HH
 func (dataFilter UserFilter) GetVacancies(pp, page int) (rsp HHresponse, err error) {
 	var hh htpcli.RequestDealer = &htpcli.HTTPclient{Socket: &http.Client{}}
-	urq := fmt.Sprintf("https://api.hh.ru/vacancies?&experience=%s&schedule=%s&search_field=name&applicant_comments_order=creation_time_desc&per_page=%d", dataFilter.Experience, dataFilter.Schedule, pp)
+	urq := fmt.Sprintf("https://api.hh.ru/vacancies?&experience=%s&schedule=%s&applicant_comments_order=creation_time_desc&per_page=%d", dataFilter.Experience, dataFilter.Schedule, pp)
 	if dataFilter.Vacancyname != "" {
 		urq += "&text=NAME%3A(" + dataFilter.Vacancyname + ")"
 	}
@@ -89,6 +89,24 @@ func getAreas() (rsp Countries, err error) {
 	if err != nil {
 		return
 	}
+	if err = json.Unmarshal(b, &rsp); err != nil {
+		return
+	}
+	return
+}
+
+func GetSchedulesList() (rsp ScheduleData, err error) {
+	var hh htpcli.RequestDealer = &htpcli.HTTPclient{Socket: &http.Client{}}
+	urq := "https://api.hh.ru/dictionaries"
+	r, err := hh.NewGet(urq, map[string]string{"User-Agent": "HH-User-Agent"}).Do()
+	if err != nil {
+		return
+	}
+	b, err := io.ReadAll(r.Body)
+	if err != nil {
+		return
+	}
+
 	if err = json.Unmarshal(b, &rsp); err != nil {
 		return
 	}
@@ -153,24 +171,6 @@ func (countries Countries) CreateToDB() (err error) {
 	return nil
 }
 
-func GetSchedulesList() (rsp ScheduleData, err error) {
-	var hh htpcli.RequestDealer = &htpcli.HTTPclient{Socket: &http.Client{}}
-	urq := "https://api.hh.ru/dictionaries"
-	r, err := hh.NewGet(urq, map[string]string{"User-Agent": "HH-User-Agent"}).Do()
-	if err != nil {
-		return
-	}
-	b, err := io.ReadAll(r.Body)
-	if err != nil {
-		return
-	}
-
-	if err = json.Unmarshal(b, &rsp); err != nil {
-		return
-	}
-	return
-}
-
 // package HH model to model of DB package convert
 func (from ScheduleData) SchedulesModelConvert() (to bd.Schedules) {
 	for _, s := range from.List {
@@ -179,7 +179,7 @@ func (from ScheduleData) SchedulesModelConvert() (to bd.Schedules) {
 	return
 }
 
-func GetUserData(userdata []bd.UserData) (userFilterList []UserFilter) {
+func ConvertUserData(userdata []bd.UserData) (userFilterList []UserFilter) {
 	for _, bdUd := range userdata {
 		userFilterTemp := UserFilter{TgID: bdUd.TgID, Vacancyname: bdUd.VacancyName, Location: int(bdUd.Location), Schedule: bdUd.Schedule}
 		if bdUd.ExperienceYear < 1 {

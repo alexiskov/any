@@ -20,9 +20,8 @@ type (
 		Location       uint
 	}
 	JobAnnounce struct {
-		gorm.Model
-		ItemId         int `gorm:"uniqueIndex"`
-		Name           string
+		ItemId         int    `gorm:"primaryKey"`
+		Name           string `gorm:"index"`
 		Expierence     string
 		SalaryGross    bool
 		SalaryFrom     float64
@@ -34,6 +33,9 @@ type (
 		Responsebility string
 		Link           string
 	}
+
+	JobAnnounces []JobAnnounce
+
 	UserPivotVacancy struct {
 		gorm.Model
 		UID    uint
@@ -65,4 +67,9 @@ type (
 	}
 
 	Schedules []Schedule
+
+	VacancynameSearchPattern struct {
+		gorm.Model
+		VacancyName string `gorm:"index"`
+	}
 )
