@@ -24,7 +24,7 @@ func Init(host, user, password, dbname string, port int, sslmode string) (err er
 }
 
 func Migrate() (err error) {
-	if err = DB.Socket.AutoMigrate(UserData{}, JobAnnounce{}, UserPivotVacancy{}, Country{}, Region{}, City{}, Schedule{}, VacancynameSearchPattern{}); err != nil {
+	if err = DB.Socket.AutoMigrate(UserData{}, JobAnnounce{}, UserPivotVacancy{}, Country{}, Region{}, City{}, Schedule{}); err != nil {
 		err = fmt.Errorf("database automigration error: %w", err)
 	}
 	return
@@ -239,13 +239,6 @@ func GetSchedules(scheduleID string) (schdules Schedules, err error) {
 	return
 }
 
-func GetAllUsers() (users []UserData, err error) {
-	if err = DB.Socket.Find(&users).Error; err != nil {
-		err = fmt.Errorf("all users select error: %w", err)
-	}
-	return
-}
-
 // -------------------------------------------------------<<<JobData-----------------------
 func (ja JobAnnounces) Save() (err error) {
 	if err = DB.Socket.Save(&ja).Error; err != nil {
@@ -255,3 +248,31 @@ func (ja JobAnnounces) Save() (err error) {
 }
 
 //------------------------------------------------------->>>JobData-----------------------
+
+func (ud UserDataList) MakeVacNameSearchPatternPOOL() (pool []VacancynameSearchPattern) {
+	tempNameList := make(map[string]bool, len(ud))
+	for _, d := range ud {
+		if _, ok := tempNameList[d.VacancyName]; !ok {
+			tempNameList[d.VacancyName] = true
+		} else {
+			for k, v := range tempNameList {
+				if v && strings.Replace(strings.ToLower(k), " ", "", -1) == strings.Replace(strings.ToLower(d.VacancyName), " ", "", -1) {
+					continue
+				}
+			}
+		}
+
+		for subk, v := range tempNameList {
+			if v {
+				for k, v1 := range tempNameList {
+					if v1 && strings.Contains(strings.ToLower(k), strings.ToLower(subk)) {
+						delete(tempNameList, k)
+						tempNameList[subk] = true
+					}
+				}
+			}
+		}
+	}
+
+	return
+}

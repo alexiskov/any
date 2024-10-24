@@ -19,6 +19,9 @@ type (
 		Schedule       string
 		Location       uint
 	}
+
+	UserDataList []UserData
+
 	JobAnnounce struct {
 		ItemId         int    `gorm:"primaryKey"`
 		Name           string `gorm:"index"`
@@ -69,7 +72,6 @@ type (
 	Schedules []Schedule
 
 	VacancynameSearchPattern struct {
-		gorm.Model
 		VacancyName string `gorm:"index"`
 	}
 )
