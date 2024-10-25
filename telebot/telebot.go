@@ -125,6 +125,7 @@ func convertUserModelDBtoTG(sqluser bd.UserData) (ud UserData) {
 	return
 }
 
+// Job announce data slice model of package bd to slice model JobAnnounce convert
 func convertJobDataModelDBtoTG(jobSQLdata []bd.JobAnnounce) (ja []JobAnnounce) {
 	for _, sj := range jobSQLdata {
 		ja = append(ja, JobAnnounce{Name: sj.Name, Expierence: sj.Expierence, SalaryGross: sj.SalaryGross, SalaryFrom: sj.SalaryFrom, SalaryTo: sj.SalaryTo, SalaryCurrency: sj.SalaryCurrency, PublishedAt: sj.PublishedAt, Schedule: sj.Schedule, Requirement: sj.Requirement, Responsebility: sj.Responsebility, Link: sj.Link})
@@ -132,6 +133,7 @@ func convertJobDataModelDBtoTG(jobSQLdata []bd.JobAnnounce) (ja []JobAnnounce) {
 	return
 }
 
+// Job announce slice data model of packcage hh to slice model JobAnnounce convert
 func convertAnnounceHHtoTG(hhja hh.HHresponse) (ja []JobAnnounce) {
 	for _, ha := range hhja.Items {
 		ja = append(ja, JobAnnounce{Name: ha.Name, Expierence: ha.Experience.Name, SalaryGross: ha.Salary.Gross, SalaryFrom: ha.Salary.From, SalaryTo: ha.Salary.To, SalaryCurrency: ha.Salary.Currency, PublishedAt: ha.PublishedAt, Schedule: ha.Schedule.Name, Requirement: ha.Snippet.Requirement, Responsebility: ha.Snippet.Responsibility, Link: ha.PageURL})

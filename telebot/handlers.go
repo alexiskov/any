@@ -289,7 +289,7 @@ func callbackProcessing(ctx context.Context, b *bot.Bot, update *models.Update) 
 
 }
 
-// SetLocation Handler
+// change location Handler
 func locationSetter(ctx context.Context, b *bot.Bot, update *models.Update) {
 	tgUID := update.CallbackQuery.From.ID
 	locationID, err := strconv.Atoi(strings.Trim(update.CallbackQuery.Data, "?setLocation:"))
@@ -311,7 +311,7 @@ func locationSetter(ctx context.Context, b *bot.Bot, update *models.Update) {
 	sentUserDataToClient(ctx, tgUID, b)
 }
 
-// Set schedule handler
+// change schedule handler
 func scheduleSetter(ctx context.Context, b *bot.Bot, update *models.Update) {
 	tgUID := update.CallbackQuery.From.ID
 	u, err := findRegisterUser(tgUID)

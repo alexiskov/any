@@ -78,6 +78,7 @@ func (dataFilter UserFilter) GetVacancies(pp, page int) (rsp HHresponse, err err
 	return
 }
 
+// query to HH API
 func getAreas() (rsp Countries, err error) {
 	var hh htpcli.RequestDealer = &htpcli.HTTPclient{Socket: &http.Client{}}
 	urq := "https://api.hh.ru/areas"
@@ -95,6 +96,7 @@ func getAreas() (rsp Countries, err error) {
 	return
 }
 
+// query to HH API
 func GetSchedulesList() (rsp ScheduleData, err error) {
 	var hh htpcli.RequestDealer = &htpcli.HTTPclient{Socket: &http.Client{}}
 	urq := "https://api.hh.ru/dictionaries"
@@ -113,6 +115,7 @@ func GetSchedulesList() (rsp ScheduleData, err error) {
 	return
 }
 
+// Create list of locations in DB
 func (countries Countries) CreateToDB() (err error) {
 	sqlcountries := bd.Countries{}
 	sqlregions := bd.Regions{}
@@ -179,6 +182,7 @@ func (from ScheduleData) SchedulesModelConvert() (to bd.Schedules) {
 	return
 }
 
+// user convert model data of users from package bd to models of UserFilter
 func ConvertUserData(userdata []bd.UserData) (userFilterList []UserFilter) {
 	for _, bdUd := range userdata {
 		userFilterTemp := UserFilter{TgID: bdUd.TgID, Vacancyname: bdUd.VacancyName, Location: int(bdUd.Location), Schedule: bdUd.Schedule}
