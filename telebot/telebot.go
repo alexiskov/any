@@ -42,7 +42,7 @@ func Run(tgAPI string) (err error) {
 	return nil
 }
 
-// Find or Write user on db
+// Find or Write data of userSearch on db
 func findRegisterUser(tgID int64) (ud UserData, err error) {
 	sqludata, err := bd.FindOrCreateUser(tgID)
 	if err != nil {
@@ -74,6 +74,7 @@ func sentUserDataToClient(ctx context.Context, tgID int64, b *bot.Bot) (err erro
 	return nil
 }
 
+// Job Announce info to client of telegramBot sent
 func (ja JobAnnounce) sentJobAnnounceToClient(ctx context.Context, tgID int64, b *bot.Bot) (err error) {
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    tgID,
@@ -90,8 +91,8 @@ func (ja JobAnnounce) sentJobAnnounceToClient(ctx context.Context, tgID int64, b
 	return nil
 }
 
-//------------------------------------->>>MODEL CONVERTERS-----------------------------------
-
+// ------------------------------------->>>MODEL CONVERTERS-----------------------------------
+// User data of search, from model of package telebot to bd model convert
 func (ud UserData) convertUserModelTGtoDB() (sqluser bd.UserData) {
 	sqluser.TgID = ud.TgID
 	sqluser.VacancyName = ud.Vacancy
@@ -99,6 +100,7 @@ func (ud UserData) convertUserModelTGtoDB() (sqluser bd.UserData) {
 	return
 }
 
+// User data of search, from model of package bd to telebot model convert
 func convertUserModelDBtoTG(sqluser bd.UserData) (ud UserData) {
 	ud = UserData{TgID: sqluser.TgID, Vacancy: sqluser.VacancyName, ExperienceYears: sqluser.ExperienceYear}
 
@@ -136,5 +138,3 @@ func convertAnnounceHHtoTG(hhja hh.HHresponse) (ja []JobAnnounce) {
 	}
 	return
 }
-
-//-------------------------------------<<<MODEL CONVERTERS-----------------------------------
