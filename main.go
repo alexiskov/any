@@ -27,17 +27,17 @@ func main() {
 		logger.Error(err.Error())
 	}
 
-	go bd.StarWorker(bd.WorkDue)
-
 	if err = bd.Migrate(); err != nil {
 		logger.Error(err.Error())
 	}
-	logger.Info("database is Ready ...")
+	go bd.StarWorker(bd.WorkDue)
+	logger.Info("database worker is Ready ...")
 
 	if err = hh.Init(); err != nil {
 		logger.Error(err.Error())
 		return
 	}
+	go hh.WorkerStart(7200)
 	logger.Info("hh worker is OK")
 
 	logger.Info("telegram bot worker start")

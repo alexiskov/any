@@ -250,6 +250,15 @@ func GetSchedules(scheduleID string) (schdules Schedules, err error) {
 	return
 }
 
+// Pool of vacancie search keys from DB getting
+func GetVacancyPatterns() (vacNames VacancyNamePatterns, err error) {
+	if err = DB.Socket.Find(&vacNames).Error; err != nil {
+		err = fmt.Errorf("vacancie name poll getting error: %w", err)
+		return nil, err
+	}
+	return vacNames, nil
+}
+
 // -------------------------------------------------------<<<JobData-----------------------
 func (ja JobAnnounces) SaveInDB() (err error) {
 	if err = DB.Socket.Save(&ja).Error; err != nil {

@@ -5,8 +5,10 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"time"
 	"vacancydealer/bd"
 	"vacancydealer/htpcli"
+	"vacancydealer/logger"
 )
 
 func ConvertSerchPatternModelDBtoHH(from bd.VacancyNamePatterns) (to []HHfilterData) {
@@ -56,4 +58,29 @@ func (hf HHfilterData) GetJobAnnounces() (resp HHresponse, err error) {
 		return
 	}
 	return
+}
+
+func WorkerStart(pauseDuration int) {
+	for {
+		keys, err := bd.GetVacancyPatterns()
+		if err != nil {
+			logger.Error(err.Error())
+			continue
+		}
+		for _, k := range ConvertSerchPatternModelDBtoHH(keys) {
+			resp, err := k.GetJobAnnounces()
+			if err != nil {
+				logger.Error(err.Error())
+				continue
+			}
+			if err = resp.ConvertItemsToDB().SaveInDB(); err != nil {
+				logger.Error(err.Error())
+				continue
+			}
+			//time.Sleep()
+		}
+
+		time.Sleep(time.Duration(pauseDuration) * time.Second)
+	}
+
 }
