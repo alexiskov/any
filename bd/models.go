@@ -72,6 +72,9 @@ type (
 	Schedules []Schedule
 
 	VacancynameSearchPattern struct {
+		ID          uint   `gorm:"primaryKey"`
 		VacancyName string `gorm:"index"`
 	}
+
+	VacancyNamePatterns []VacancynameSearchPattern
 )

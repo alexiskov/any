@@ -1,6 +1,7 @@
 package bd_test
 
 import (
+	"fmt"
 	"testing"
 	"vacancydealer/bd"
 )
@@ -22,6 +23,8 @@ func TestMakeVacNameSearchPatternPOOL(t *testing.T) {
 	if len(moka.MakeVacNameSearchPatternPOOL()) != 5 {
 		t.Errorf("Result was incorrect, expected %d, got %d", 5, len(moka.MakeVacNameSearchPatternPOOL()))
 	}
+
+	fmt.Println(moka.MakeVacNameSearchPatternPOOL())
 
 	for _, v := range moka.MakeVacNameSearchPatternPOOL() {
 		switch v.VacancyName {

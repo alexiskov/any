@@ -27,6 +27,8 @@ func main() {
 		logger.Error(err.Error())
 	}
 
+	go bd.StarWorker(bd.WorkDue)
+
 	if err = bd.Migrate(); err != nil {
 		logger.Error(err.Error())
 	}

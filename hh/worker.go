@@ -9,7 +9,7 @@ import (
 	"vacancydealer/htpcli"
 )
 
-func ConvertSerchPatternModelDBtoHH(from ...bd.VacancynameSearchPattern) (to []HHfilterData) {
+func ConvertSerchPatternModelDBtoHH(from bd.VacancyNamePatterns) (to []HHfilterData) {
 	for _, v := range from {
 		to = append(to, HHfilterData{VacancyName: v.VacancyName})
 	}

@@ -87,21 +87,32 @@ func (u UserData) Update() (err error) {
 		err = fmt.Errorf("updating userData error: %w", err)
 		return
 	}
+
+	WorkDue <- true
+
 	return nil
 }
 
 func (u UserData) UpdateLocation() (err error) {
 	if err = DB.Socket.Model(&u).Where("tg_id=?", u.TgID).Update("location", u.Location).Error; err != nil {
 		err = fmt.Errorf("user data location on db update error: %w", err)
+		return
 	}
-	return
+
+	WorkDue <- true
+
+	return nil
 }
 
 func (u UserData) UpdateSchedule() (err error) {
 	if err = DB.Socket.Model(&u).Where("tg_id=?", u.TgID).Update("schedule", u.Schedule).Error; err != nil {
 		err = fmt.Errorf("user data schedule field in db update error:%w", err)
+		return
 	}
-	return
+
+	WorkDue <- true
+
+	return nil
 }
 
 func FindCitiesByName(cityName string) (cities Cities, err error) {
@@ -240,7 +251,7 @@ func GetSchedules(scheduleID string) (schdules Schedules, err error) {
 }
 
 // -------------------------------------------------------<<<JobData-----------------------
-func (ja JobAnnounces) Save() (err error) {
+func (ja JobAnnounces) SaveInDB() (err error) {
 	if err = DB.Socket.Save(&ja).Error; err != nil {
 		err = fmt.Errorf("job announces update error: %w", err)
 	}
@@ -248,37 +259,3 @@ func (ja JobAnnounces) Save() (err error) {
 }
 
 //------------------------------------------------------->>>JobData-----------------------
-
-func (ud UserDataList) MakeVacNameSearchPatternPOOL() (pool []VacancynameSearchPattern) {
-	tempNameList := make(map[string]bool, len(ud))
-	for _, d := range ud {
-		if _, ok := tempNameList[d.VacancyName]; !ok {
-			tempNameList[d.VacancyName] = true
-		} else {
-			for k, v := range tempNameList {
-				if v && strings.Replace(strings.ToLower(k), " ", "", -1) == strings.Replace(strings.ToLower(d.VacancyName), " ", "", -1) {
-					continue
-				}
-			}
-		}
-
-		for subk, v := range tempNameList {
-			if v {
-				for k, v1 := range tempNameList {
-					if v1 && strings.Contains(strings.ToLower(k), strings.ToLower(subk)) && subk != "" {
-						delete(tempNameList, k)
-						tempNameList[subk] = true
-					}
-				}
-			}
-		}
-	}
-
-	for k, v := range tempNameList {
-		if v {
-			pool = append(pool, VacancynameSearchPattern{VacancyName: k})
-		}
-	}
-
-	return
-}
