@@ -265,12 +265,18 @@ func (ud UserDataList) MakeVacNameSearchPatternPOOL() (pool []VacancynameSearchP
 		for subk, v := range tempNameList {
 			if v {
 				for k, v1 := range tempNameList {
-					if v1 && strings.Contains(strings.ToLower(k), strings.ToLower(subk)) {
+					if v1 && strings.Contains(strings.ToLower(k), strings.ToLower(subk)) && subk != "" {
 						delete(tempNameList, k)
 						tempNameList[subk] = true
 					}
 				}
 			}
+		}
+	}
+
+	for k, v := range tempNameList {
+		if v {
+			pool = append(pool, VacancynameSearchPattern{VacancyName: k})
 		}
 	}
 
