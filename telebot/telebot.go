@@ -36,7 +36,7 @@ func Run(tgAPI string) (err error) {
 	if err != nil {
 		return
 	}
-
+	StartWorker(ctx, b)
 	b.Start(ctx)
 
 	return nil

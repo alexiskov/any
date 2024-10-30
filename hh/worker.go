@@ -60,6 +60,7 @@ func (hf HHfilterData) GetJobAnnounces() (resp HHresponse, err error) {
 	return
 }
 
+// vacancy announce query to HHunter-API send
 func WorkerStart(pauseDuration int) {
 	for {
 		keys, err := bd.GetVacancyPatterns()
@@ -77,7 +78,7 @@ func WorkerStart(pauseDuration int) {
 				logger.Error(err.Error())
 				continue
 			}
-			//time.Sleep()
+			time.Sleep(time.Duration(pauseDuration/len(keys)) * time.Second)
 		}
 
 		time.Sleep(time.Duration(pauseDuration) * time.Second)
