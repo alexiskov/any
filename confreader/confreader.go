@@ -10,17 +10,13 @@ import (
 
 type (
 	Configs struct {
-		WebServer *HTTPserver
-		DMS       *DataBase
-		Tbot      *TbotData
+		DMS  *DataBase
+		Tbot *TbotData
 	}
 	TbotData struct {
 		API string `env:"TGBOT_APIKEY"`
 	}
-	HTTPserver struct {
-		Port     int    `env:"HTTPSERVER_PORT"`
-		TimeZone string `env:"HTTPSERVER_TIMEZONE"`
-	}
+
 	DataBase struct {
 		Host     string `env:"DB_HOST"`
 		Port     int    `env:"DB_PORT"`
@@ -36,14 +32,7 @@ func LoadConfig() (c Configs, err error) {
 		err = fmt.Errorf("config loading -> env-file loading error: %w", err)
 		return
 	}
-	c = Configs{&HTTPserver{TimeZone: os.Getenv("HTTPSERVER_TIMEZONE")}, &DataBase{Host: os.Getenv("DB_HOST"), DBname: os.Getenv("DB_NAME"), User: os.Getenv("DB_USER"), Password: os.Getenv("DB_PASSWORD"), SSLmode: os.Getenv("DB_SSLMODE")}, &TbotData{API: os.Getenv("TGBOT_APIKEY")}}
-
-	if htpsport, err := strconv.Atoi(os.Getenv("HTTPSERVER_PORT")); err != nil {
-		err = fmt.Errorf("config field HTTPSERVER_PORT parse error: %w", err)
-		return Configs{}, err
-	} else {
-		c.WebServer.Port = htpsport
-	}
+	c = Configs{&DataBase{Host: os.Getenv("DB_HOST"), DBname: os.Getenv("DB_NAME"), User: os.Getenv("DB_USER"), Password: os.Getenv("DB_PASSWORD"), SSLmode: os.Getenv("DB_SSLMODE")}, &TbotData{API: os.Getenv("TGBOT_APIKEY")}}
 
 	if dbport, err := strconv.Atoi(os.Getenv("DB_PORT")); err != nil {
 		err = fmt.Errorf("config field DB_PORT parse error: %w", err)
