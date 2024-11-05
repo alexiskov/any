@@ -24,7 +24,7 @@ func Init(host, user, password, dbname string, port int, sslmode string) (err er
 }
 
 func Migrate() (err error) {
-	if err = DB.Socket.AutoMigrate(UserData{}, JobAnnounce{}, UserPivotVacancy{}, Country{}, Region{}, City{}, Schedule{}); err != nil {
+	if err = DB.Socket.AutoMigrate(UserData{}, JobAnnounce{}, UserPivotVacancy{}, Country{}, Region{}, City{}, Schedule{}, VacancynameSearchPattern{}); err != nil {
 		err = fmt.Errorf("database automigration error: %w", err)
 	}
 	return

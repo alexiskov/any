@@ -7,7 +7,7 @@ import (
 )
 
 func StartWorker(ctx context.Context, b *bot.Bot) {
-	for {
+	/*for {
 
-	}
+	}*/
 }
