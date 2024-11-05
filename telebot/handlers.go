@@ -278,6 +278,14 @@ func callbackProcessing(ctx context.Context, b *bot.Bot, update *models.Update) 
 				return
 			}
 
+			if len(res.Items) == 0 {
+				b.SendMessage(ctx, &bot.SendMessageParams{
+					ChatID:    tgUID,
+					ParseMode: models.ParseModeHTML,
+					Text:      "<b>Нет результатов запроса</b>\nпопробуйте изменить параметры поиска",
+				})
+			}
+
 			for _, j := range convertAnnounceHHtoTG(res) {
 				if err = j.sentJobAnnounceToClient(ctx, tgUID, b); err != nil {
 					logger.Error(err.Error())
