@@ -14,7 +14,7 @@ func main() {
 	logger.InitInfoTextlog(os.Stdout)
 	logger.Info("logger status is Run...")
 
-	logger.InitErrorJSONlog(os.Stdout)
+	logger.InitErrorTemplog(logger.CreateTXTlog())
 	logger.Info("error log stream status is run!")
 
 	conf, err := confreader.LoadConfig()
