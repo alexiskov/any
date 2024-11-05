@@ -86,6 +86,7 @@ func getAreas() (rsp Countries, err error) {
 	if err != nil {
 		return
 	}
+
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
 		return
@@ -104,6 +105,7 @@ func GetSchedulesList() (rsp ScheduleData, err error) {
 	if err != nil {
 		return
 	}
+
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
 		return
