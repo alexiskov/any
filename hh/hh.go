@@ -61,8 +61,6 @@ func (dataFilter UserFilter) GetVacancies(pp, page int) (rsp HHresponse, err err
 		urq += "&area=" + strconv.Itoa(dataFilter.Location)
 	}
 
-	fmt.Println(urq)
-
 	r, err := hh.NewGet(urq, map[string]string{"User-Agent": "HH-User-Agent"}).Do()
 	if err != nil {
 		return
