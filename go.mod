@@ -6,7 +6,6 @@ require (
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-telegram/bot v1.8.4
 	github.com/joho/godotenv v1.5.1
-	golang.org/x/net v0.10.0
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/gorm v1.25.12
 )
