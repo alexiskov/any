@@ -24,6 +24,8 @@ type (
 
 	JobAnnounce struct {
 		Name           string
+		Company        string
+		Area           string
 		Expierence     string
 		SalaryGross    bool
 		SalaryFrom     float64

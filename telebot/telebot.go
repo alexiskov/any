@@ -81,7 +81,7 @@ func (ja JobAnnounce) sentJobAnnounceToClient(ctx context.Context, tgID int64, b
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    tgID,
 		ParseMode: models.ParseModeHTML,
-		Text:      fmt.Sprintf("<b> <u>%s</u> </b>\n\n<b>Требуемый опыт: </b><i> %s</i>\n<b>Зп указана до уплаты налогов: </b>%t\n<b>Размер ЗП:</b>%.2f - %.2f%s\n<b>Графика работы: </b>%s", ja.Name, ja.Expierence, ja.SalaryGross, ja.SalaryFrom, ja.SalaryTo, ja.SalaryCurrency, ja.Schedule),
+		Text:      fmt.Sprintf("<b> <u>%s</u> </b>\n<i>Наниматель: </i><b>%s</b>\n<i>Локация: </i><u>%s</u>\n\n<b>Требуемый опыт: </b><i> %s</i>\n<b>Зп указана до уплаты налогов: </b>%t\n<b>Размер ЗП:</b>%.2f - %.2f%s\n<b>Графика работы: </b>%s", ja.Name, ja.Company, ja.Area, ja.Expierence, ja.SalaryGross, ja.SalaryFrom, ja.SalaryTo, ja.SalaryCurrency, ja.Schedule),
 		ReplyMarkup: &models.InlineKeyboardMarkup{InlineKeyboard: [][]models.InlineKeyboardButton{
 			{{Text: "источник", URL: ja.Link}},
 		}},
@@ -138,7 +138,7 @@ func convertJobDataModelDBtoTG(jobSQLdata []bd.JobAnnounce) (ja []JobAnnounce) {
 // Job announce slice data model of packcage hh to slice model JobAnnounce convert
 func convertAnnounceHHtoTG(hhja hh.HHresponse) (ja []JobAnnounce) {
 	for _, ha := range hhja.Items {
-		ja = append(ja, JobAnnounce{Name: ha.Name, Expierence: ha.Experience.Name, SalaryGross: ha.Salary.Gross, SalaryFrom: ha.Salary.From, SalaryTo: ha.Salary.To, SalaryCurrency: ha.Salary.Currency, PublishedAt: ha.PublishedAt, Schedule: ha.Schedule.Name, Requirement: ha.Snippet.Requirement, Responsebility: ha.Snippet.Responsibility, Link: ha.PageURL})
+		ja = append(ja, JobAnnounce{Name: ha.Name, Company: ha.Employer.Name, Area: ha.Area.Name, Expierence: ha.Experience.Name, SalaryGross: ha.Salary.Gross, SalaryFrom: ha.Salary.From, SalaryTo: ha.Salary.To, SalaryCurrency: ha.Salary.Currency, PublishedAt: ha.PublishedAt, Schedule: ha.Schedule.Name, Requirement: ha.Snippet.Requirement, Responsebility: ha.Snippet.Responsibility, Link: ha.PageURL})
 	}
 	return
 }
