@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 	"vacancydealer/bd"
 	"vacancydealer/htpcli"
 )
@@ -47,6 +48,9 @@ func (dataFilter UserFilter) GetVacancies(pp, page int) (rsp HHresponse, err err
 	var hh htpcli.RequestDealer = &htpcli.HTTPclient{Socket: &http.Client{}}
 	urq := fmt.Sprintf("https://api.hh.ru/vacancies?&experience=%s&schedule=%s&applicant_comments_order=creation_time_desc&per_page=%d", dataFilter.Experience, dataFilter.Schedule, pp)
 	if dataFilter.Vacancyname != "" {
+		if strings.Contains(dataFilter.Vacancyname, " ") {
+			dataFilter.Vacancyname = strings.ReplaceAll(dataFilter.Vacancyname, " ", "+")
+		}
 		urq += "&text=NAME%3A(" + dataFilter.Vacancyname + ")"
 	}
 
@@ -56,6 +60,9 @@ func (dataFilter UserFilter) GetVacancies(pp, page int) (rsp HHresponse, err err
 	if dataFilter.Location != 0 {
 		urq += "&area=" + strconv.Itoa(dataFilter.Location)
 	}
+
+	fmt.Println(urq)
+
 	r, err := hh.NewGet(urq, map[string]string{"User-Agent": "HH-User-Agent"}).Do()
 	if err != nil {
 		return
