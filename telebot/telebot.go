@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"time"
 	"vacancydealer/bd"
 	"vacancydealer/hh"
 	"vacancydealer/logger"
@@ -23,9 +22,9 @@ var (
 func Run(tgAPI string) (err error) {
 	UserStates = make(map[int64]UserStateData, 100)
 
-	d := time.Now().Add(150 * time.Second)
-	contextDuration, cancel := context.WithDeadline(context.Background(), d)
-	ctx, cancel := signal.NotifyContext(contextDuration, os.Interrupt)
+	/*d := time.Now().Add(150 * time.Second)
+	contextDuration, cancel := context.WithDeadline(context.Background(), d)*/
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
 	opts := []bot.Option{
