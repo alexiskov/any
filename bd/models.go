@@ -25,6 +25,8 @@ type (
 	JobAnnounce struct {
 		ItemId         int    `gorm:"primaryKey"`
 		Name           string `gorm:"index"`
+		Company        string
+		Area           int
 		Expierence     string
 		SalaryGross    bool
 		SalaryFrom     float64

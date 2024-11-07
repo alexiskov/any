@@ -24,7 +24,13 @@ func (hh HHresponse) ConvertItemsToDB() (bdja bd.JobAnnounces) {
 		if err != nil {
 			continue
 		}
-		bdja = append(bdja, bd.JobAnnounce{ItemId: id, Name: vac.Name, Expierence: vac.Experience.Name, SalaryGross: vac.Salary.Gross, SalaryFrom: vac.Salary.From, SalaryTo: vac.Salary.To, SalaryCurrency: vac.Salary.Currency, PublishedAt: vac.PublishedAt, Requirement: vac.Snippet.Requirement, Responsebility: vac.Snippet.Responsibility, Link: vac.PageURL})
+
+		locID, err := strconv.Atoi(vac.Area.RegionID)
+		if err != nil {
+			continue
+		}
+
+		bdja = append(bdja, bd.JobAnnounce{ItemId: id, Name: vac.Name, Company: vac.Employer.Name, Area: locID, Expierence: vac.Experience.Name, SalaryGross: vac.Salary.Gross, SalaryFrom: vac.Salary.From, SalaryTo: vac.Salary.To, SalaryCurrency: vac.Salary.Currency, PublishedAt: vac.PublishedAt, Requirement: vac.Snippet.Requirement, Responsebility: vac.Snippet.Responsibility, Link: vac.PageURL})
 	}
 	return
 }
