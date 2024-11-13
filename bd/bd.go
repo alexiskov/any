@@ -281,12 +281,12 @@ func (ud UserData) GetJobAnnounces() (announces JobAnnounces, err error) {
 
 	if ud.Schedule != "" {
 		if err = DB.Socket.Limit(20).Where("LOWER(name) like ? and expierence <= ? and schedule = ? ", "%"+strings.ToLower(ud.VacancyName)+"%", expierence, ud.Schedule).Find(&announces).Error; err != nil {
-			err = fmt.Errorf("db vacancy without param schedule getting error: %w", err)
+			err = fmt.Errorf("db vacancy with param schedule getting error: %w", err)
 			return
 		}
 	} else {
 		if err = DB.Socket.Limit(20).Where("LOWER(name) like ? and expierence <= ? ", "%"+strings.ToLower(ud.VacancyName)+"%", expierence).Find(&announces).Error; err != nil {
-			err = fmt.Errorf("db vacancy with param schedule getting error: %w", err)
+			err = fmt.Errorf("db vacancy without param schedule getting error: %w", err)
 			return
 		}
 	}
