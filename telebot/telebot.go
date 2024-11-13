@@ -130,6 +130,17 @@ func convertUserModelDBtoTG(sqluser bd.UserData) (ud UserData) {
 // Job announce data slice model of package bd to slice model JobAnnounce convert
 func convertJobDataModelDBtoTG(jobSQLdata []bd.JobAnnounce) (ja []JobAnnounce) {
 	for _, sj := range jobSQLdata {
+		switch sj.Expierence {
+		case "noExperience":
+			sj.Expierence = "без опыта"
+		case "between1And3":
+			sj.Expierence = "от 1 года до 3"
+		case "between3And6":
+			sj.Expierence = "от 3 лет до 6"
+		case "moreThan6":
+			sj.Expierence = " свыше 6 лет"
+		}
+
 		ja = append(ja, JobAnnounce{Name: sj.Name, Expierence: sj.Expierence, SalaryGross: sj.SalaryGross, SalaryFrom: sj.SalaryFrom, SalaryTo: sj.SalaryTo, SalaryCurrency: sj.SalaryCurrency, PublishedAt: sj.PublishedAt, Schedule: sj.Schedule, Requirement: sj.Requirement, Responsebility: sj.Responsebility, Link: sj.Link})
 	}
 	return
