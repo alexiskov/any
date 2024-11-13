@@ -267,4 +267,31 @@ func (ja JobAnnounces) SaveInDB() (err error) {
 	return
 }
 
+func (ud UserData) GetJobAnnounces() (announces JobAnnounces, err error) {
+	var expierence string
+	if ud.ExperienceYear < 1 {
+		expierence = "noExperience"
+	} else if ud.ExperienceYear >= 1 && ud.ExperienceYear <= 3 {
+		expierence = "between1And3"
+	} else if ud.ExperienceYear < 3 && ud.ExperienceYear <= 6 {
+		expierence = "between3And6"
+	} else if ud.ExperienceYear > 6 {
+		expierence = "moreThan6"
+	}
+
+	if ud.Schedule != "" {
+		if err = DB.Socket.Where("LOWER(name) like ? and expierence <= ? and schedule = ?", "%"+strings.ToLower(ud.VacancyName)+"%", expierence, ud.Schedule).Find(&announces).Error; err != nil {
+			err = fmt.Errorf("db vacancy with param schedule getting error: %w", err)
+			return
+		}
+	} else {
+		if err = DB.Socket.Where("LOWER(name) like ? and expierence <= ?", "%"+strings.ToLower(ud.VacancyName)+"%", expierence).Find(&announces).Error; err != nil {
+			err = fmt.Errorf("db vacancy without param schedule getting error: %w", err)
+			return
+		}
+	}
+
+	return
+}
+
 // ------------------------------------------------------->>>JobData-----------------------
