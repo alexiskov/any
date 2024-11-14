@@ -30,7 +30,7 @@ func (hh HHresponse) ConvertItemsToDB() (bdja bd.JobAnnounces) {
 			continue
 		}
 
-		bdja = append(bdja, bd.JobAnnounce{ItemId: id, Name: vac.Name, Company: vac.Employer.Name, Area: locID, Expierence: vac.Experience.ID, SalaryGross: vac.Salary.Gross, SalaryFrom: vac.Salary.From, SalaryTo: vac.Salary.To, SalaryCurrency: vac.Salary.Currency, PublishedAt: vac.PublishedAt, Schedule: vac.Schedule.ID, Requirement: vac.Snippet.Requirement, Responsebility: vac.Snippet.Responsibility, Link: vac.PageURL})
+		bdja = append(bdja, bd.JobAnnounce{ItemId: uint(id), Name: vac.Name, Company: vac.Employer.Name, Area: locID, Expierence: vac.Experience.ID, SalaryGross: vac.Salary.Gross, SalaryFrom: vac.Salary.From, SalaryTo: vac.Salary.To, SalaryCurrency: vac.Salary.Currency, PublishedAt: vac.PublishedAt, Schedule: vac.Schedule.ID, Requirement: vac.Snippet.Requirement, Responsebility: vac.Snippet.Responsibility, Link: vac.PageURL})
 	}
 	return
 }

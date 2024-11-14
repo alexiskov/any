@@ -23,7 +23,7 @@ type (
 	UserDataList []UserData
 
 	JobAnnounce struct {
-		ItemId         int    `gorm:"primaryKey"`
+		ItemId         uint   `gorm:"primaryKey"`
 		Name           string `gorm:"index"`
 		Company        string
 		Area           int

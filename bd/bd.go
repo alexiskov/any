@@ -279,15 +279,43 @@ func (ud UserData) GetJobAnnounces() (announces JobAnnounces, err error) {
 		expierence = "moreThan6"
 	}
 
-	if ud.Schedule != "" {
-		if err = DB.Socket.Limit(20).Where("LOWER(name) like ? and expierence <= ? and schedule = ? ", "%"+strings.ToLower(ud.VacancyName)+"%", expierence, ud.Schedule).Find(&announces).Error; err != nil {
-			err = fmt.Errorf("db vacancy with param schedule getting error: %w", err)
+	var shownAnnounces []UserPivotVacancy
+	if err = DB.Socket.Where("uid=?", ud.TgID).Find(&shownAnnounces).Error; err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			err = fmt.Errorf("shown announces getting error: %w", err)
 			return
 		}
+
+	}
+
+	var shownAnnouncesIDs []uint
+	for _, shown := range shownAnnounces {
+		shownAnnouncesIDs = append(shownAnnouncesIDs, shown.JobID)
+	}
+
+	if len(shownAnnounces) != 0 {
+		if ud.Schedule != "" {
+			if err = DB.Socket.Limit(50).Where("LOWER(name) like ? and expierence = ? and schedule = ? and  item_id not in ?", "%"+strings.ToLower(ud.VacancyName)+"%", expierence, ud.Schedule, shownAnnouncesIDs).Find(&announces).Error; err != nil {
+				err = fmt.Errorf("db vacancy with param schedule getting error: %w", err)
+				return
+			}
+		} else {
+			if err = DB.Socket.Limit(50).Where("LOWER(name) like ? and expierence = ? and  item_id not in ?", "%"+strings.ToLower(ud.VacancyName)+"%", expierence, shownAnnouncesIDs).Find(&announces).Error; err != nil {
+				err = fmt.Errorf("db vacancy without param schedule getting error: %w", err)
+				return
+			}
+		}
 	} else {
-		if err = DB.Socket.Limit(20).Where("LOWER(name) like ? and expierence <= ? ", "%"+strings.ToLower(ud.VacancyName)+"%", expierence).Find(&announces).Error; err != nil {
-			err = fmt.Errorf("db vacancy without param schedule getting error: %w", err)
-			return
+		if ud.Schedule != "" {
+			if err = DB.Socket.Limit(50).Where("LOWER(name) like ? and expierence = ? and schedule = ? ", "%"+strings.ToLower(ud.VacancyName)+"%", expierence, ud.Schedule).Find(&announces).Error; err != nil {
+				err = fmt.Errorf("db vacancy with param schedule getting error: %w", err)
+				return
+			}
+		} else {
+			if err = DB.Socket.Limit(50).Where("LOWER(name) like ? and expierence = ? ", "%"+strings.ToLower(ud.VacancyName)+"%", expierence).Find(&announces).Error; err != nil {
+				err = fmt.Errorf("db vacancy without param schedule getting error: %w", err)
+				return
+			}
 		}
 	}
 
@@ -295,3 +323,14 @@ func (ud UserData) GetJobAnnounces() (announces JobAnnounces, err error) {
 }
 
 // ------------------------------------------------------->>>JobData-----------------------
+
+func CreatePivotVacancyAnnouncesAndUserIds(jobAnnouncesIDs []uint, uid uint) (err error) {
+	var tempPivot []UserPivotVacancy
+	for _, id := range jobAnnouncesIDs {
+		tempPivot = append(tempPivot, UserPivotVacancy{UID: uid, JobID: id})
+	}
+	if err = DB.Socket.Create(&tempPivot).Error; err != nil {
+		err = fmt.Errorf("db vacancy-user pivot record writing error: %w", err)
+	}
+	return
+}

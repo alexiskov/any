@@ -153,7 +153,7 @@ func convertJobDataModelDBtoTG(jobSQLdata []bd.JobAnnounce) (ja []JobAnnounce) {
 			}
 		}
 
-		ja = append(ja, JobAnnounce{Name: sj.Name, Experience: sj.Expierence, SalaryGross: sj.SalaryGross, SalaryFrom: sj.SalaryFrom, SalaryTo: sj.SalaryTo, SalaryCurrency: sj.SalaryCurrency, PublishedAt: sj.PublishedAt, Schedule: sj.Schedule, Requirement: sj.Requirement, Responsebility: sj.Responsebility, Link: sj.Link})
+		ja = append(ja, JobAnnounce{ItemID: uint(sj.ItemId), Name: sj.Name, Experience: sj.Expierence, SalaryGross: sj.SalaryGross, SalaryFrom: sj.SalaryFrom, SalaryTo: sj.SalaryTo, SalaryCurrency: sj.SalaryCurrency, PublishedAt: sj.PublishedAt, Schedule: sj.Schedule, Requirement: sj.Requirement, Responsebility: sj.Responsebility, Link: sj.Link})
 	}
 	return
 }

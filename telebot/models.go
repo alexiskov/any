@@ -23,6 +23,7 @@ type (
 	}
 
 	JobAnnounce struct {
+		ItemID         uint
 		Name           string
 		Company        string
 		Area           string
