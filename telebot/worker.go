@@ -45,7 +45,10 @@ func StartWorker(ctx context.Context, b *bot.Bot) {
 			}
 		}
 
-		time.Sleep(time.Duration(10800/len(uds)) * time.Second) //period
+		if len(uds) != 0 {
+			time.Sleep(time.Duration(10800/len(uds)) * time.Second) //period
+		}
+
 	}
 
 }

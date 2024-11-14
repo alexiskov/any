@@ -84,7 +84,10 @@ func WorkerStart(pauseDuration int) {
 				logger.Error(err.Error())
 				continue
 			}
-			time.Sleep(time.Duration(pauseDuration/len(keys)) * time.Second)
+			if len(keys) != 0 {
+				time.Sleep(time.Duration(pauseDuration/len(keys)) * time.Second)
+			}
+
 		}
 
 		time.Sleep(time.Duration(pauseDuration) * time.Second)
