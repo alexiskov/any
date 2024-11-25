@@ -156,6 +156,8 @@ func (areasHH Countries) CreateToDB() (err error) {
 				err = fmt.Errorf("regions on DB create, region id parse error: %w", err)
 				return err
 			}
+
+			//Подготовка паттерна для регионов
 			//.rgxRegion := re.ReplaceAllString(region.Name, "")
 
 			////Обработка городов--
