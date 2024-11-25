@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"regexp"
 	"strconv"
 	"strings"
 	"vacancydealer/bd"
@@ -22,21 +21,25 @@ var (
 	StatusBadRequest = errors.New("status BadRequest")
 )
 
+// Инициализация базовых справочников из ХэХа
+// Получение данных Локаций
+// Получение графиков работ
+// Запись в БД
 func Init() (err error) {
-	r, err := getAreas()
+	areasHH, err := getAreas()
 	if err != nil {
 		return
 	}
 
-	if err = r.CreateToDB(); err != nil {
+	if err = areasHH.CreateToDB(); err != nil {
 		return
 	}
 
-	sch, err := GetSchedulesList()
+	schedulesHH, err := GetSchedulesList()
 	if err != nil {
 		return
 	}
-	if err = sch.SchedulesModelConvert().CreateToDB(); err != nil {
+	if err = schedulesHH.SchedulesModelConvert().CreateToDB(); err != nil {
 		return
 	}
 
@@ -122,19 +125,22 @@ func GetSchedulesList() (rsp ScheduleData, err error) {
 	return
 }
 
-// Create list of locations in DB
-func (countries Countries) CreateToDB() (err error) {
+// Справочник локаций из ХэХа
+// Обработка и запись в БД
+func (areasHH Countries) CreateToDB() (err error) {
 	sqlcountries := bd.Countries{}
 	sqlregions := bd.Regions{}
 	sqlcities := bd.Cities{}
 
-	re, err := regexp.Compile(`\(.*\)`)
+	/*re, err := regexp.Compile(`\(.*\)`)
 	if err != nil {
 		err = fmt.Errorf("Create logations on DB -> regxp pattern compilation error: %w", err)
 		return err
-	}
+		}*/
 
-	for _, country := range countries {
+	//..Обработка стран
+	//*Принятая рессивером с ХэХа схема json разбирается циклом
+	for _, country := range areasHH {
 		coi, err := strconv.Atoi(country.ID)
 		if err != nil {
 			err = fmt.Errorf("regions on DB create, region id parse error: %w", err)
@@ -142,15 +148,21 @@ func (countries Countries) CreateToDB() (err error) {
 		}
 		sqlcountries = append(sqlcountries, bd.Country{ID: uint(coi), Name: country.Name})
 
+		//..Обработка локаций-
+		//Разведение стран, областей и городов по разным справочникам
 		for _, region := range country.Regions {
 			ri, err := strconv.Atoi(region.ID)
 			if err != nil {
 				err = fmt.Errorf("regions on DB create, region id parse error: %w", err)
 				return err
 			}
-			rgxRegion := re.ReplaceAllString(region.Name, "")
+			//.rgxRegion := re.ReplaceAllString(region.Name, "")
+
+			////Обработка городов--
+			//.отсев регионов не содержащих городов
+			//.Отсеятся ,,МЕгаполисы???(не имеют родителя области. Имеют страну))))
 			if len(region.Cities) != 0 {
-				sqlregions = append(sqlregions, bd.Region{ID: uint(ri), Name: rgxRegion, Owner: uint(coi)})
+				sqlregions = append(sqlregions, bd.Region{ID: uint(ri), Name: "" /*rgxRegion*/, Owner: uint(coi)}) //замена
 				for _, city := range region.Cities {
 					ci, err := strconv.Atoi(city.ID)
 					if err != nil {
