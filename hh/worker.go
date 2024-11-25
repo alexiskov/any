@@ -18,7 +18,7 @@ func ConvertSerchPatternModelDBtoHH(from bd.VacancyNamePatterns) (to []HHfilterD
 	return
 }
 
-func (hh HHresponse) ConvertItemsToDB() (bdja bd.JobAnnounces) {
+func (hh HHresponse) ConvertItemsToDB(areas bd.AreaData) (bdja bd.JobAnnounces) {
 	for _, vac := range hh.Items {
 		id, err := strconv.Atoi(vac.ID)
 		if err != nil {
@@ -30,7 +30,9 @@ func (hh HHresponse) ConvertItemsToDB() (bdja bd.JobAnnounces) {
 			continue
 		}
 
-		bdja = append(bdja, bd.JobAnnounce{ItemId: uint(id), Name: vac.Name, Company: vac.Employer.Name, Area: locID, Expierence: vac.Experience.ID, SalaryGross: vac.Salary.Gross, SalaryFrom: vac.Salary.From, SalaryTo: vac.Salary.To, SalaryCurrency: vac.Salary.Currency, PublishedAt: vac.PublishedAt, Schedule: vac.Schedule.ID, Requirement: vac.Snippet.Requirement, Responsebility: vac.Snippet.Responsibility, Link: vac.PageURL})
+		country, region, city := areas.FindRegionAndCountryByAreaID(locID)
+
+		bdja = append(bdja, bd.JobAnnounce{ItemId: uint(id), Name: vac.Name, Company: vac.Employer.Name, Area: int(city.ID), Region: int(region.ID), Country: int(country.ID), Expierence: vac.Experience.ID, SalaryGross: vac.Salary.Gross, SalaryFrom: vac.Salary.From, SalaryTo: vac.Salary.To, SalaryCurrency: vac.Salary.Currency, PublishedAt: vac.PublishedAt, Schedule: vac.Schedule.ID, Requirement: vac.Snippet.Requirement, Responsebility: vac.Snippet.Responsibility, Link: vac.PageURL})
 	}
 	return
 }
@@ -68,6 +70,14 @@ func (hf HHfilterData) GetJobAnnounces() (resp HHresponse, err error) {
 
 // vacancy announce query to HHunter-API send
 func WorkerStart(pauseDuration int) {
+	time.Sleep(time.Duration(10) * time.Second)
+
+	areas, err := bd.FindRegionAndCountryStruct()
+	if err != nil {
+		logger.Error(err.Error())
+		panic(err)
+	}
+
 	for {
 		keys, err := bd.GetVacancyPatterns()
 		if err != nil {
@@ -80,7 +90,7 @@ func WorkerStart(pauseDuration int) {
 				logger.Error(err.Error())
 				continue
 			}
-			if err = resp.ConvertItemsToDB().SaveInDB(); err != nil {
+			if err = resp.ConvertItemsToDB(areas).SaveInDB(); err != nil {
 				logger.Error(err.Error())
 				continue
 			}

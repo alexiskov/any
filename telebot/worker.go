@@ -12,6 +12,12 @@ import (
 // Automatic worker
 // New vacancieAnnounces to user sent
 func StartWorker(ctx context.Context, b *bot.Bot) {
+	areas, err := bd.FindRegionAndCountryStruct()
+	if err != nil {
+		logger.Error(err.Error())
+		panic(err)
+	}
+
 	for {
 		uds, err := bd.GetAllUserData()
 		if err != nil {
@@ -28,7 +34,7 @@ func StartWorker(ctx context.Context, b *bot.Bot) {
 
 			var showedJobAnnoucesIDs []uint
 
-			for _, ja := range convertJobDataModelDBtoTG(a) {
+			for _, ja := range convertJobDataModelDBtoTG(a, areas) {
 				if err = ja.sentJobAnnounceToClient(ctx, ud.TgID, b); err != nil {
 					logger.Error(err.Error())
 					continue
@@ -46,9 +52,8 @@ func StartWorker(ctx context.Context, b *bot.Bot) {
 		}
 
 		if len(uds) != 0 {
-			time.Sleep(time.Duration(10800/len(uds)) * time.Second) //period
+			time.Sleep(time.Duration(60/len(uds)) * time.Second) //period
 		}
 
 	}
-
 }

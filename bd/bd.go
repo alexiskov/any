@@ -189,6 +189,72 @@ func FindCountries() (countries Countries, err error) {
 	return
 }
 
+func FindRegionAndCountryStruct() (ad AreaData, err error) {
+	countries := Countries{}
+	if err = DB.Socket.Find(&countries).Error; err != nil {
+		return
+	}
+
+	for _, c := range countries {
+		countrieData := CountrieData{}
+		countrieData.Count.ID = c.ID
+		countrieData.Count.Name = c.Name
+
+		regions := Regions{}
+		if err = DB.Socket.Where("owner=?", c.ID).Find(&regions).Error; err != nil {
+			continue
+		}
+
+		for _, r := range regions {
+			regionsData := RegionData{}
+			regionsData.Region.ID = r.ID
+			regionsData.Region.Name = r.Name
+			regionsData.Region.Owner = countrieData.Count.ID
+
+			if err = DB.Socket.Where("owner=?", r.ID).Find(&regionsData.Cities).Error; err != nil {
+				continue
+			}
+
+			countrieData.Regions = append(countrieData.Regions, regionsData)
+		}
+
+		ad.Countries = append(ad.Countries, countrieData)
+	}
+	return
+}
+
+func (ad AreaData) FindRegionAndCountryByAreaID(areaID int) (country Country, region Region, city City) {
+
+	for _, countr := range ad.Countries {
+		if countr.Count.ID == uint(areaID) {
+			country = countr.Count
+			region = Region{}
+			city = City{}
+			return
+		}
+
+		for _, reg := range countr.Regions {
+			if reg.Region.ID == uint(areaID) {
+				city = City{}
+				region = reg.Region
+				country = countr.Count
+				return
+			}
+
+			for _, cit := range reg.Cities {
+				if cit.ID == uint(areaID) {
+					city = cit
+					region = reg.Region
+					country = countr.Count
+					return
+				}
+			}
+		}
+	}
+
+	return
+}
+
 // Поиск локации по ИД
 // Проверяет ИД по порядку в таблицах: стран, регионов, населенных пунктов
 func FindLocByID(locID uint) (locName string, err error) {

@@ -27,6 +27,8 @@ type (
 		Name           string `gorm:"index"`
 		Company        string
 		Area           int
+		Region         int
+		Country        int
 		Expierence     string
 		SalaryGross    bool
 		SalaryFrom     float64
@@ -78,4 +80,16 @@ type (
 	}
 
 	VacancyNamePatterns []VacancynameSearchPattern
+
+	AreaData struct {
+		Countries []CountrieData
+	}
+	CountrieData struct {
+		Count   Country
+		Regions []RegionData
+	}
+	RegionData struct {
+		Region Region
+		Cities []City
+	}
 )

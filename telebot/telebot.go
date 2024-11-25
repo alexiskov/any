@@ -128,7 +128,7 @@ func convertUserModelDBtoTG(sqluser bd.UserData) (ud UserData) {
 }
 
 // Job announce data slice model of package bd to slice model JobAnnounce convert
-func convertJobDataModelDBtoTG(jobSQLdata []bd.JobAnnounce) (ja []JobAnnounce) {
+func convertJobDataModelDBtoTG(jobSQLdata []bd.JobAnnounce, areas bd.AreaData) (ja []JobAnnounce) {
 	schedules, err := bd.GetSchedules("")
 	if err != nil {
 		logger.Error(err.Error())
@@ -153,7 +153,9 @@ func convertJobDataModelDBtoTG(jobSQLdata []bd.JobAnnounce) (ja []JobAnnounce) {
 			}
 		}
 
-		ja = append(ja, JobAnnounce{ItemID: uint(sj.ItemId), Name: sj.Name, Company: sj.Company, Experience: sj.Expierence, SalaryGross: sj.SalaryGross, SalaryFrom: sj.SalaryFrom, SalaryTo: sj.SalaryTo, SalaryCurrency: sj.SalaryCurrency, PublishedAt: sj.PublishedAt, Schedule: sj.Schedule, Requirement: sj.Requirement, Responsebility: sj.Responsebility, Link: sj.Link})
+		countr, regi, city := areas.FindRegionAndCountryByAreaID(sj.Area)
+
+		ja = append(ja, JobAnnounce{ItemID: uint(sj.ItemId), Name: sj.Name, Company: sj.Company, Area: fmt.Sprintf("%s %s %s", countr.Name, regi.Name, city.Name), Experience: sj.Expierence, SalaryGross: sj.SalaryGross, SalaryFrom: sj.SalaryFrom, SalaryTo: sj.SalaryTo, SalaryCurrency: sj.SalaryCurrency, PublishedAt: sj.PublishedAt, Schedule: sj.Schedule, Requirement: sj.Requirement, Responsebility: sj.Responsebility, Link: sj.Link})
 	}
 	return
 }

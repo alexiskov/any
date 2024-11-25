@@ -37,7 +37,7 @@ func main() {
 		logger.Error(err.Error())
 		return
 	}
-	go hh.WorkerStart(7200)
+	go hh.WorkerStart(10)
 	logger.Info("hh worker is OK")
 
 	logger.Info("telegram bot worker start")
