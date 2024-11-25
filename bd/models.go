@@ -43,9 +43,8 @@ type (
 
 	UserPivotVacancy struct {
 		gorm.Model
-		UID    uint
-		JobID  uint `gorm:"uniqueIndex"`
-		Showed bool `gorm:"index"`
+		UID   uint
+		JobID uint `gorm:"uniqueIndex"`
 	}
 
 	Country struct {
