@@ -127,37 +127,25 @@ func convertUserModelDBtoTG(sqluser bd.UserData) (ud UserData) {
 	return
 }
 
-// Job announce data slice model of package bd to slice model JobAnnounce convert
-func convertJobDataModelDBtoTG(jobSQLdata []bd.JobAnnounce, areas bd.AreaData) (ja []JobAnnounce) {
-	schedules, err := bd.GetSchedules("")
-	if err != nil {
-		logger.Error(err.Error())
-		return
-	}
+// Job announce data slice model of package bd -- to slice model JobAnnounce convert
+func convertJobDataModelDBtoTG(dbData []bd.JobAnnounce, areas bd.Countries) (ja []JobAnnounce) {
 
-	for _, sj := range jobSQLdata {
-		switch sj.Expierence {
+	for _, dd := range dbData {
+		switch dd.Expierence {
 		case "noExperience":
-			sj.Expierence = "без опыта"
+			dd.Expierence = "без опыта"
 		case "between1And3":
-			sj.Expierence = "от 1 года до 3"
+			dd.Expierence = "от 1 года до 3"
 		case "between3And6":
-			sj.Expierence = "от 3 лет до 6"
+			dd.Expierence = "от 3 лет до 6"
 		case "moreThan6":
-			sj.Expierence = " свыше 6 лет"
+			dd.Expierence = " свыше 6 лет"
 		}
 
-		for _, schedule := range schedules {
-			if schedule.HhID == sj.Schedule {
-				sj.Schedule = schedule.Name
-			}
-		}
-
-		countr, regi, city := areas.FindRegionAndCountryByAreaID(sj.Area)
-
-		ja = append(ja, JobAnnounce{ItemID: uint(sj.ItemId), Name: sj.Name, Company: sj.Company, Area: fmt.Sprintf("%s %s %s", countr.Name, regi.Name, city.Name), Experience: sj.Expierence, SalaryGross: sj.SalaryGross, SalaryFrom: sj.SalaryFrom, SalaryTo: sj.SalaryTo, SalaryCurrency: sj.SalaryCurrency, PublishedAt: sj.PublishedAt, Schedule: sj.Schedule, Requirement: sj.Requirement, Responsebility: sj.Responsebility, Link: sj.Link})
+		ja = append(ja, JobAnnounce{ItemID: uint(dd.ItemId), Name: dd.Name, Company: dd.Company, Area: fmt.Sprintf("%s %s %s", dd.Country, dd.Region, dd.Area), Experience: dd.Expierence, SalaryGross: dd.SalaryGross, SalaryFrom: dd.SalaryFrom, SalaryTo: dd.SalaryTo, SalaryCurrency: dd.SalaryCurrency, Schedule: dd.Schedule, Link: dd.Link})
 	}
 	return
+
 }
 
 // Job announce slice data model of packcage hh to slice model JobAnnounce convert

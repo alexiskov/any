@@ -12,7 +12,7 @@ import (
 // Automatic worker
 // New vacancieAnnounces to user sent
 func StartWorker(ctx context.Context, b *bot.Bot) {
-	areas, err := bd.FindRegionAndCountryStruct()
+	areas, err := bd.CountriesLis()
 	if err != nil {
 		logger.Error(err.Error())
 		panic(err)

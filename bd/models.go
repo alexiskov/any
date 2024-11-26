@@ -49,7 +49,7 @@ type (
 		JobID uint `gorm:"uniqueIndex"`
 	}
 
-	Country struct {
+	CountrySQL struct {
 		ID   uint   `gorm:"primaryKey"`
 		Name string `gorm:"index"`
 	}
@@ -63,9 +63,28 @@ type (
 		Name  string `gorm:"index"`
 		Owner uint
 	}
-	Countries []Country
-	Regions   []Region
-	Cities    []City
+
+	AreaData struct {
+		Countries []CountrieModel
+	}
+	CountrieModel struct {
+		Count   AreaEntity
+		Regions Regions
+	}
+	RegionModel struct {
+		Region AreaEntity
+		Cities Cities
+	}
+
+	AreaEntity struct {
+		ID    uint
+		Name  string
+		Owner uint
+	}
+
+	Countries []CountrieModel
+	Regions   []RegionModel
+	Cities    []AreaEntity
 
 	Schedule struct {
 		HhID string `gorm:"primaryKey"`
@@ -80,16 +99,4 @@ type (
 	}
 
 	VacancyNamePatterns []VacancynameSearchPattern
-
-	AreaData struct {
-		Countries []CountrieData
-	}
-	CountrieData struct {
-		Count   Country
-		Regions []RegionData
-	}
-	RegionData struct {
-		Region Region
-		Cities []City
-	}
 )

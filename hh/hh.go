@@ -149,7 +149,7 @@ func (areasHH Countries) CreateToDB() (err error) {
 			err = fmt.Errorf("regions on DB create, region id parse error: %w", err)
 			return err
 		}
-		sqlcountries = append(sqlcountries, bd.Country{ID: uint(coi), Name: country.Name})
+		sqlcountries = append(sqlcountries, bd.AreaEntity{ID: uint(coi), Name: country.Name})
 
 		for _, region := range country.AreaList {
 			ri, err := strconv.Atoi(region.ID)
@@ -171,7 +171,7 @@ func (areasHH Countries) CreateToDB() (err error) {
 					}
 					sqlcities = append(sqlcities, bd.City{ID: uint(ciID), Name: city.Name, Owner: uint(ri)})
 				}
-			} else {
+			} else { //////////////////////////////////////////////////////////////////////////////////////
 				sqlcities = append(sqlcities, bd.City{ID: uint(ri), Name: region.Name, Owner: uint(coi)})
 			}
 

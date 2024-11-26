@@ -27,6 +27,8 @@ type (
 		Name           string
 		Company        string
 		Area           string
+		Region         string
+		Country        string
 		Experience     string
 		SalaryGross    bool
 		SalaryFrom     float64
