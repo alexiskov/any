@@ -87,6 +87,7 @@ func (dataFilter UserFilter) GetVacancies(pp, page int) (rsp HHresponse, err err
 }
 
 // query to HH API
+// Получаем локации от ХэХа
 func getAreas() (rsp Countries, err error) {
 	var hh htpcli.RequestDealer = &htpcli.HTTPclient{Socket: &http.Client{}}
 	urq := "https://api.hh.ru/areas"
@@ -127,19 +128,21 @@ func GetSchedulesList() (rsp ScheduleData, err error) {
 
 // Справочник локаций из ХэХа
 // Обработка и запись в БД
+//
+//	//..Обработка стран
+//
+// *Принятая рессивером с ХэХа схема json разбирается циклом
+// Разведение стран, областей и городов по разным справочникам
+// ..Обработка локаций-
 func (areasHH Countries) CreateToDB() (err error) {
 	sqlcountries := bd.Countries{}
 	sqlregions := bd.Regions{}
 	sqlcities := bd.Cities{}
 
-	/*re, err := regexp.Compile(`\(.*\)`)
-	if err != nil {
-		err = fmt.Errorf("Create logations on DB -> regxp pattern compilation error: %w", err)
-		return err
-		}*/
+	// [htym]!
+	type Shit struct {
+	}
 
-	//..Обработка стран
-	//*Принятая рессивером с ХэХа схема json разбирается циклом
 	for _, country := range areasHH {
 		coi, err := strconv.Atoi(country.ID)
 		if err != nil {
@@ -148,32 +151,25 @@ func (areasHH Countries) CreateToDB() (err error) {
 		}
 		sqlcountries = append(sqlcountries, bd.Country{ID: uint(coi), Name: country.Name})
 
-		//..Обработка локаций-
-		//Разведение стран, областей и городов по разным справочникам
-		for _, region := range country.Regions {
+		for _, region := range country.AreaList {
 			ri, err := strconv.Atoi(region.ID)
 			if err != nil {
 				err = fmt.Errorf("regions on DB create, region id parse error: %w", err)
 				return err
 			}
 
-			//Подготовка паттерна для регионов
-			//.rgxRegion := re.ReplaceAllString(region.Name, "")
-
 			////Обработка городов--
 			//.отсев регионов не содержащих городов
 			//.Отсеятся ,,МЕгаполисы???(не имеют родителя области. Имеют страну))))
-			if len(region.Cities) != 0 {
-				sqlregions = append(sqlregions, bd.Region{ID: uint(ri), Name: "" /*rgxRegion*/, Owner: uint(coi)}) //замена
-				for _, city := range region.Cities {
-					ci, err := strconv.Atoi(city.ID)
+			if len(region.AreaList) != 0 { //Отбираем регионы не содержащие городов
+				sqlregions = append(sqlregions, bd.Region{ID: uint(ri), Name: region.Name, Owner: uint(coi)}) //замена
+				for _, city := range region.AreaList {
+					ciID, err := strconv.Atoi(city.ID)
 					if err != nil {
 						err = fmt.Errorf("regions on DB create, region id parse error: %w", err)
 						return err
 					}
-
-					rgxCity := re.ReplaceAllString(city.Name, "")
-					sqlcities = append(sqlcities, bd.City{ID: uint(ci), Name: rgxCity, Owner: uint(ri)})
+					sqlcities = append(sqlcities, bd.City{ID: uint(ciID), Name: city.Name, Owner: uint(ri)})
 				}
 			} else {
 				sqlcities = append(sqlcities, bd.City{ID: uint(ri), Name: region.Name, Owner: uint(coi)})

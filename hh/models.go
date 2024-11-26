@@ -52,7 +52,7 @@ type (
 	}
 
 	// for hh areas index query
-	Country struct {
+	/* Country struct {
 		ID      string   `json:"id"`
 		Name    string   `json:"name"`
 		Regions []Region `json:"areas"`
@@ -65,8 +65,15 @@ type (
 	City struct {
 		ID   string `json:"id"`
 		Name string `json:"name"`
+	}*/
+
+	Area struct {
+		ID       string `json:"id"`
+		Name     string `json:"name"`
+		AreaList []Area `json:"area"`
 	}
-	Countries []Country
+
+	Countries []Area
 
 	// for hh vacancy params
 	ScheduleData struct {
