@@ -70,7 +70,7 @@ type (
 	Area struct {
 		ID       string `json:"id"`
 		Name     string `json:"name"`
-		AreaList []Area `json:"area"`
+		AreaList []Area `json:"areas"`
 	}
 
 	Areas []Area
