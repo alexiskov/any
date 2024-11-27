@@ -73,7 +73,7 @@ type (
 		AreaList []Area `json:"area"`
 	}
 
-	Countries []Area
+	Areas []Area
 
 	// for hh vacancy params
 	ScheduleData struct {

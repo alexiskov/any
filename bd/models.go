@@ -63,6 +63,9 @@ type (
 		Name  string `gorm:"index"`
 		Owner uint
 	}
+	SQLcountries []CountrySQL
+	SQLregions   []Region
+	SQLcities    []City
 
 	AreaData struct {
 		Countries []CountrieModel

@@ -19,7 +19,7 @@ func ConvertSerchPatternModelDBtoHH(from bd.VacancyNamePatterns) (to []HHfilterD
 	return
 }
 
-func (hh HHresponse) ConvertItemsToDB() (bdja bd.JobAnnounces) {
+func (hh HHresponse) ConvertItemsToDB(areas bd.Countries) (bdja bd.JobAnnounces) {
 	for _, vac := range hh.Items {
 		id, err := strconv.Atoi(vac.ID)
 		if err != nil {
@@ -31,7 +31,7 @@ func (hh HHresponse) ConvertItemsToDB() (bdja bd.JobAnnounces) {
 			continue
 		}
 
-		bd.FindLocByID(uint(locID))
+		country, region, city := areas.FindLocationByAreaID(locID)
 
 		bdja = append(bdja, bd.JobAnnounce{ItemId: uint(id), Name: vac.Name, Company: vac.Employer.Name, Area: int(city.ID), Region: int(region.ID), Country: int(country.ID), Expierence: vac.Experience.ID, SalaryGross: vac.Salary.Gross, SalaryFrom: vac.Salary.From, SalaryTo: vac.Salary.To, SalaryCurrency: vac.Salary.Currency, PublishedAt: vac.PublishedAt, Schedule: vac.Schedule.ID, Requirement: vac.Snippet.Requirement, Responsebility: vac.Snippet.Responsibility, Link: vac.PageURL})
 	}
@@ -78,7 +78,7 @@ func (hf HHfilterData) GetJobAnnounces() (hhResponseRest HHresponse, err error) 
 func WorkerStart(pauseDuration int) {
 	time.Sleep(time.Duration(10) * time.Second)
 
-	areas, err := bd.CountriesList()
+	areas, err := bd.CountriesLis()
 	if err != nil {
 		logger.Error(err.Error())
 		panic(err)

@@ -88,7 +88,7 @@ func (dataFilter UserFilter) GetVacancies(pp, page int) (rsp HHresponse, err err
 
 // query to HH API
 // Получаем локации от ХэХа
-func getAreas() (rsp Countries, err error) {
+func getAreas() (rsp Areas, err error) {
 	var hh htpcli.RequestDealer = &htpcli.HTTPclient{Socket: &http.Client{}}
 	urq := "https://api.hh.ru/areas"
 	r, err := hh.NewGet(urq, map[string]string{"User-Agent": "HH-User-Agent"}).Do()
@@ -134,14 +134,10 @@ func GetSchedulesList() (rsp ScheduleData, err error) {
 // *Принятая рессивером с ХэХа схема json разбирается циклом
 // Разведение стран, областей и городов по разным справочникам
 // ..Обработка локаций-
-func (areasHH Countries) CreateToDB() (err error) {
-	sqlcountries := bd.Countries{}
-	sqlregions := bd.Regions{}
-	sqlcities := bd.Cities{}
-
-	// [htym]!
-	type Shit struct {
-	}
+func (areasHH Areas) CreateToDB() (err error) {
+	sqlcountries := bd.SQLcountries{}
+	sqlregions := bd.SQLregions{}
+	sqlcities := bd.SQLcities{}
 
 	for _, country := range areasHH {
 		coi, err := strconv.Atoi(country.ID)
@@ -149,7 +145,7 @@ func (areasHH Countries) CreateToDB() (err error) {
 			err = fmt.Errorf("regions on DB create, region id parse error: %w", err)
 			return err
 		}
-		sqlcountries = append(sqlcountries, bd.AreaEntity{ID: uint(coi), Name: country.Name})
+		sqlcountries = append(sqlcountries, bd.CountrySQL{ID: uint(coi), Name: country.Name})
 
 		for _, region := range country.AreaList {
 			ri, err := strconv.Atoi(region.ID)
@@ -178,13 +174,13 @@ func (areasHH Countries) CreateToDB() (err error) {
 		}
 	}
 
-	if err = sqlcountries.WriteCountries(); err != nil {
+	if err = sqlcountries.WriteToDB(); err != nil {
 		return
 	}
-	if err = sqlregions.WriteRegions(); err != nil {
+	if err = sqlregions.WriteToDB(); err != nil {
 		return
 	}
-	if err = sqlcities.WriteCities(); err != nil {
+	if err = sqlcities.WriteToDB(); err != nil {
 		return
 	}
 

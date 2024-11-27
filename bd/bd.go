@@ -33,22 +33,21 @@ func Migrate() (err error) {
 // ----------------------------------------<<<INITIALIZATION----------------------------------------------------------------------
 
 // ------------------------------------------------------------->>>LOCATION WRITERS-----------------------------------------------------
-func (countries *Countries) WriteCountries() (err error) {
-	fmt.Printf("%w::%+v", err, countries)
+func (countries SQLcountries) WriteToDB() (err error) {
 	if err = DB.Socket.Save(&countries).Error; err != nil {
 		err = fmt.Errorf("list of region save error: %w", err)
 	}
 	return
 }
 
-func (regions Regions) WriteRegions() (err error) {
+func (regions SQLregions) WriteToDB() (err error) {
 	if err = DB.Socket.Save(&regions).Error; err != nil {
 		err = fmt.Errorf("list of region save error: %w", err)
 	}
 	return
 }
 
-func (cities Cities) WriteCities() (err error) {
+func (cities SQLcities) WriteToDB() (err error) {
 	if err = DB.Socket.Save(&cities).Error; err != nil {
 		err = fmt.Errorf("list of region save error: %w", err)
 	}
@@ -149,7 +148,7 @@ func CountriesLis() (ad Countries, err error) {
 	return
 }
 
-func an() {
+/*func an() {
 	regions := Regions{}
 	if err = DB.Socket.Where("owner=?", c.ID).Find(&regions).Error; err != nil {
 		continue
@@ -169,9 +168,9 @@ func an() {
 	}
 
 	ad.Countries = append(ad.Countries, countrieData)
-}
+}*/
 
-func FindCitiesByName(cityName string) (cities Cities, err error) {
+func FindCitiesByName(cityName string) (cities SQLcities, err error) {
 	if err = DB.Socket.Where("LOWER(name) like ?", "%"+strings.ToLower(cityName)+"%").Find(&cities).Error; err != nil {
 		err = fmt.Errorf("cities by name finding error: %w", err)
 		return
@@ -181,7 +180,7 @@ func FindCitiesByName(cityName string) (cities Cities, err error) {
 		IDs = append(IDs, city.Owner)
 	}
 
-	regions := Regions{}
+	regions := SQLregions{}
 	if err = DB.Socket.Where("id in ?", IDs).Find(&regions).Error; err != nil {
 		err = fmt.Errorf("regions by id finding error: %w", err)
 		return
@@ -191,7 +190,7 @@ func FindCitiesByName(cityName string) (cities Cities, err error) {
 		IDs = append(IDs, region.Owner)
 	}
 
-	countries := Countries{}
+	countries := SQLcountries{}
 	if err = DB.Socket.Where("id in ?", IDs).Find(&countries).Error; err != nil {
 		err = fmt.Errorf("countries by id finding error: %w", err)
 		return
@@ -212,7 +211,7 @@ func FindCitiesByName(cityName string) (cities Cities, err error) {
 	return
 }
 
-func FindRegionByName(regionName string) (regions Regions, err error) {
+func FindRegionByName(regionName string) (regions SQLregions, err error) {
 	if err = DB.Socket.Where("LOWER(name) like ?", "%"+strings.ToLower(regionName)+"%").Find(&regions).Error; err != nil {
 		err = fmt.Errorf("Find region by name error: %w", err)
 		return
@@ -222,7 +221,7 @@ func FindRegionByName(regionName string) (regions Regions, err error) {
 		IDs = append(IDs, region.Owner)
 	}
 
-	countries := Countries{}
+	countries := SQLcountries{}
 	if err = DB.Socket.Where("id in ?", IDs).Find(&countries).Error; err != nil {
 		err = fmt.Errorf("find countries by id error: %w", err)
 		return
@@ -238,7 +237,7 @@ func FindRegionByName(regionName string) (regions Regions, err error) {
 	return
 }
 
-func FindCountries() (countries Countries, err error) {
+func FindCountries() (countries SQLcountries, err error) {
 	if err = DB.Socket.Find(&countries).Error; err != nil {
 		err = fmt.Errorf("countries finding error: %w", err)
 	}
@@ -248,20 +247,20 @@ func FindCountries() (countries Countries, err error) {
 func (ad Countries) FindLocationByAreaID(areaID int) (country *AreaEntity, region *AreaEntity, city *AreaEntity) {
 
 	for _, countr := range ad {
-		if countr.ID == uint(areaID) {
-			country = &AreaEntity{ID: countr.ID, Name: countr.Name}
+		if countr.Count.ID == uint(areaID) {
+			country = &AreaEntity{ID: countr.Count.ID, Name: countr.Count.Name}
 			continue
 		}
 
 		for _, reg := range countr.Regions {
-			if reg.Region == areaID {
+			if int(reg.Region.ID) == areaID {
 			}
 
 			for _, cit := range reg.Cities {
 				if cit.ID == uint(areaID) {
-					city = cit
-					region = reg.Region
-					country = countr.Count
+					city = &cit
+					region = &reg.Region
+					country = &countr.Count
 					return
 				}
 			}
@@ -275,7 +274,7 @@ func (ad Countries) FindLocationByAreaID(areaID int) (country *AreaEntity, regio
 // Проверяет ИД по порядку в таблицах: стран, регионов, населенных пунктов
 func FindLocByID(locID uint) (locName string, err error) {
 	locName = "не имеет значения"
-	country := Country{}
+	country := CountrySQL{}
 	if err = DB.Socket.Where("id=?", locID).First(&country).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			region := Region{}
