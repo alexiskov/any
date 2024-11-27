@@ -115,7 +115,23 @@ func (u UserData) UpdateSchedule() (err error) {
 	return nil
 }
 
-func idsSequence(areas []AreaEntity) (iDs []uint) {
+func (areas SQLcountries) IdsSequence() (iDs []uint) {
+	iDs = make([]uint, 0, len(areas))
+	for _, area := range areas {
+		iDs = append(iDs, area.ID)
+	}
+	return
+}
+
+func (areas SQLregions) IdsSequence() (iDs []uint) {
+	iDs = make([]uint, 0, len(areas))
+	for _, area := range areas {
+		iDs = append(iDs, area.ID)
+	}
+	return
+}
+
+func (areas SQLcities) IdsSequence() (iDs []uint) {
 	iDs = make([]uint, 0, len(areas))
 	for _, area := range areas {
 		iDs = append(iDs, area.ID)
@@ -124,27 +140,47 @@ func idsSequence(areas []AreaEntity) (iDs []uint) {
 }
 
 // idace******DB
-func CountriesLis() (ad Countries, err error) {
-	dbSQLCountries := []AreaEntity{}
+func CountriesLis() (areaData Countries, err error) {
+	dbSQLCountries := SQLcountries{}
 	if err = DB.Socket.Find(&dbSQLCountries).Error; err != nil {
+		err = fmt.Errorf("bd CountriesLis getting error: %w", err)
 		return
 	}
-	countriesIDs := idsSequence(dbSQLCountries)
 
-	dbSQLRegions := []AreaEntity{}
-	if err = DB.Socket.Where("owner IN ?", countriesIDs).Find(&dbSQLRegions).Error; err != nil {
-		err = fmt.Errorf("bd get countries list erro : %w", err)
+	dbSQLRegions := SQLregions{}
+	if err = DB.Socket.Where("owner IN ?", dbSQLCountries.IdsSequence()).Find(&dbSQLRegions).Error; err != nil {
+		err = fmt.Errorf("bd Countrieslis: regions getting error: %w", err)
 		return
 	}
 
 	//to cities region need
 
-	regionsIDs := idsSequence(dbSQLRegions)
-
-	dbsSQLCities := []Region{}
-	if err = DB.Socket.Where("owner IN ?", regionsIDs).Find(&dbsSQLCities).Error; err != nil {
+	dbSQLCities := SQLcities{}
+	if err = DB.Socket.Where("owner IN ?", dbSQLRegions.IdsSequence()).Find(&dbSQLCities).Error; err != nil {
+		err = fmt.Errorf("bd CountriesLis: cities getting error: %w", err)
 		return
 	}
+
+	for _, country := range dbSQLCountries {
+		co := CountrieModel{Count: AreaEntity{ID: country.ID, Name: country.Name}}
+
+		for _, region := range dbSQLRegions {
+			reg := RegionModel{Region: AreaEntity{ID: region.ID, Name: region.Name, Owner: region.Owner}}
+
+			for _, city := range dbSQLCities {
+				if city.Owner == region.ID {
+					c := AreaEntity{ID: city.ID, Name: city.Name, Owner: city.Owner}
+					reg.Cities = append(reg.Cities, c)
+				}
+			}
+
+			if region.Owner == country.ID {
+				co.Regions = append(co.Regions, reg)
+			}
+		}
+		areaData = append(areaData, co)
+	}
+
 	return
 }
 

@@ -142,7 +142,23 @@ func convertJobDataModelDBtoTG(dbData []bd.JobAnnounce, areas bd.Countries) (ja 
 			dd.Expierence = " свыше 6 лет"
 		}
 
-		ja = append(ja, JobAnnounce{ItemID: uint(dd.ItemId), Name: dd.Name, Company: dd.Company, Area: fmt.Sprintf("%s %s %s", dd.Country, dd.Region, dd.Area), Experience: dd.Expierence, SalaryGross: dd.SalaryGross, SalaryFrom: dd.SalaryFrom, SalaryTo: dd.SalaryTo, SalaryCurrency: dd.SalaryCurrency, Schedule: dd.Schedule, Link: dd.Link})
+		country, region, city := areas.FindLocationByAreaID(dd.Area)
+
+		var coName, rName, ciName string
+
+		if country != nil {
+			coName = country.Name
+		} else {
+			coName = "не указана"
+		}
+		if region != nil {
+			rName = region.Name
+		}
+		if city != nil {
+			ciName = city.Name
+		}
+
+		ja = append(ja, JobAnnounce{ItemID: uint(dd.ItemId), Name: dd.Name, Company: dd.Company, Area: fmt.Sprintf("%s %s %s", coName, rName, ciName), Experience: dd.Expierence, SalaryGross: dd.SalaryGross, SalaryFrom: dd.SalaryFrom, SalaryTo: dd.SalaryTo, SalaryCurrency: dd.SalaryCurrency, Schedule: dd.Schedule, Link: dd.Link})
 	}
 	return
 
