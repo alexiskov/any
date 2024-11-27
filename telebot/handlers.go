@@ -243,7 +243,7 @@ func callbackProcessing(ctx context.Context, b *bot.Bot, update *models.Update) 
 		UserStates[tgUID] = state
 	case "#changeSchedule":
 
-		sch, err := bd.GetSchedules("")
+		sch, err := bd.GetSchedule("")
 		if err != nil {
 			logger.Error(err.Error())
 			return

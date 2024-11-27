@@ -118,7 +118,7 @@ func convertUserModelDBtoTG(sqluser bd.UserData) (ud UserData) {
 		}
 	}
 
-	res, _ := bd.GetSchedules(sqluser.Schedule)
+	res, _ := bd.GetSchedule(sqluser.Schedule)
 	ud.Schedule = res[0].Name
 
 	if sqluser.VacancyName == "" {
@@ -129,6 +129,10 @@ func convertUserModelDBtoTG(sqluser bd.UserData) (ud UserData) {
 
 // Job announce data slice model of package bd -- to slice model JobAnnounce convert
 func convertJobDataModelDBtoTG(dbData []bd.JobAnnounce, areas bd.Countries) (ja []JobAnnounce) {
+	schedulesList, err := bd.GetSchedulesList()
+	if err != nil {
+		panic(err)
+	}
 
 	for _, dd := range dbData {
 		switch dd.Expierence {
@@ -158,7 +162,14 @@ func convertJobDataModelDBtoTG(dbData []bd.JobAnnounce, areas bd.Countries) (ja 
 			ciName = city.Name
 		}
 
-		ja = append(ja, JobAnnounce{ItemID: uint(dd.ItemId), Name: dd.Name, Company: dd.Company, Area: fmt.Sprintf("%s %s %s", coName, rName, ciName), Experience: dd.Expierence, SalaryGross: dd.SalaryGross, SalaryFrom: dd.SalaryFrom, SalaryTo: dd.SalaryTo, SalaryCurrency: dd.SalaryCurrency, Schedule: dd.Schedule, Link: dd.Link})
+		schedule := ""
+		for _, s := range schedulesList {
+			if s.HhID == dd.Schedule {
+				schedule = s.Name
+			}
+		}
+
+		ja = append(ja, JobAnnounce{ItemID: uint(dd.ItemId), Name: dd.Name, Company: dd.Company, Area: fmt.Sprintf("%s %s %s", coName, rName, ciName), Experience: dd.Expierence, SalaryGross: dd.SalaryGross, SalaryFrom: dd.SalaryFrom, SalaryTo: dd.SalaryTo, SalaryCurrency: dd.SalaryCurrency, Schedule: schedule, Link: dd.Link})
 	}
 	return
 

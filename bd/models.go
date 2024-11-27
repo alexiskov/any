@@ -27,8 +27,6 @@ type (
 		Name           string `gorm:"index"`
 		Company        string
 		Area           int
-		Region         int
-		Country        int
 		Expierence     string
 		SalaryGross    bool
 		SalaryFrom     float64

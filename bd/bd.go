@@ -284,12 +284,15 @@ func (ad Countries) FindLocationByAreaID(areaID int) (country *AreaEntity, regio
 
 	for _, countr := range ad {
 		if countr.Count.ID == uint(areaID) {
-			country = &AreaEntity{ID: countr.Count.ID, Name: countr.Count.Name}
-			continue
+			country = &countr.Count
+			return
 		}
 
 		for _, reg := range countr.Regions {
-			if int(reg.Region.ID) == areaID {
+			if reg.Region.ID == uint(areaID) {
+				country = &countr.Count
+				region = &reg.Region
+				return
 			}
 
 			for _, cit := range reg.Cities {
@@ -354,7 +357,7 @@ func (sch Schedules) CreateToDB() (err error) {
 }
 
 // shedules finding
-func GetSchedules(scheduleID string) (schdules Schedules, err error) {
+func GetSchedule(scheduleID string) (schdules Schedules, err error) {
 	if len(scheduleID) == 0 {
 		if err = DB.Socket.Find(&schdules).Error; err != nil {
 			return
@@ -363,6 +366,13 @@ func GetSchedules(scheduleID string) (schdules Schedules, err error) {
 		if err = DB.Socket.Where("hh_id=?", scheduleID).First(&schdules).Error; err != nil {
 			return
 		}
+	}
+	return
+}
+
+func GetSchedulesList() (schedules Schedules, err error) {
+	if err = DB.Socket.Find(&schedules).Error; err != nil {
+		err = fmt.Errorf("bd GetSchedulesList getting Error: %w", err)
 	}
 	return
 }

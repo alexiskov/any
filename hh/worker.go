@@ -31,21 +31,7 @@ func (hh HHresponse) ConvertItemsToDB(areas bd.Countries) (bdja bd.JobAnnounces)
 			continue
 		}
 
-		country, region, city := areas.FindLocationByAreaID(locID)
-		///-----------------> location maybe nil???? panic()!!!
-		var coID, rID, cID int
-
-		if country != nil {
-			coID = int(country.ID)
-		}
-		if region != nil {
-			rID = int(region.ID)
-		}
-		if city != nil {
-			cID = int(city.ID)
-		}
-
-		bdja = append(bdja, bd.JobAnnounce{ItemId: uint(id), Name: vac.Name, Company: vac.Employer.Name, Area: cID, Region: rID, Country: coID, Expierence: vac.Experience.ID, SalaryGross: vac.Salary.Gross, SalaryFrom: vac.Salary.From, SalaryTo: vac.Salary.To, SalaryCurrency: vac.Salary.Currency, PublishedAt: vac.PublishedAt, Schedule: vac.Schedule.ID, Requirement: vac.Snippet.Requirement, Responsebility: vac.Snippet.Responsibility, Link: vac.PageURL})
+		bdja = append(bdja, bd.JobAnnounce{ItemId: uint(id), Name: vac.Name, Company: vac.Employer.Name, Area: locID, Expierence: vac.Experience.ID, SalaryGross: vac.Salary.Gross, SalaryFrom: vac.Salary.From, SalaryTo: vac.Salary.To, SalaryCurrency: vac.Salary.Currency, PublishedAt: vac.PublishedAt, Schedule: vac.Schedule.ID, Requirement: vac.Snippet.Requirement, Responsebility: vac.Snippet.Responsibility, Link: vac.PageURL})
 	}
 	return
 }
