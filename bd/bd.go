@@ -309,6 +309,43 @@ func (ad Countries) FindLocationByAreaID(areaID int) (country *AreaEntity, regio
 	return
 }
 
+func (ad Countries) FindContainLocationIDsList(areaID uint) (locationListIDs []uint) {
+	if areaID != 0 {
+		for _, country := range ad {
+
+			if country.Count.ID == areaID {
+				locationListIDs = append(locationListIDs, country.Count.ID)
+				for _, region := range country.Regions {
+					locationListIDs = append(locationListIDs, region.Region.ID)
+					for _, city := range region.Cities {
+						locationListIDs = append(locationListIDs, city.ID)
+					}
+				}
+				return
+			}
+
+			for _, region := range country.Regions {
+				if region.Region.ID == areaID {
+					locationListIDs = append(locationListIDs, region.Region.ID)
+					for _, city := range region.Cities {
+						locationListIDs = append(locationListIDs, city.ID)
+					}
+					return
+				}
+
+				for _, city := range region.Cities {
+					if city.ID == areaID {
+						locationListIDs = append(locationListIDs, city.ID)
+						return
+					}
+				}
+			}
+
+		}
+	}
+	return
+}
+
 // Поиск локации по ИД
 // Проверяет ИД по порядку в таблицах: стран, регионов, населенных пунктов
 func FindLocByID(locID uint) (locName string, err error) {
@@ -394,7 +431,7 @@ func (ja JobAnnounces) SaveInDB() (err error) {
 	return
 }
 
-func (ud UserData) GetJobAnnounces() (announces JobAnnounces, err error) {
+func (ud UserData) GetJobAnnounces(areas Countries) (announces JobAnnounces, err error) {
 	var expierence string
 	if ud.ExperienceYear < 1 {
 		expierence = "noExperience"
@@ -420,29 +457,37 @@ func (ud UserData) GetJobAnnounces() (announces JobAnnounces, err error) {
 		shownAnnouncesIDs = append(shownAnnouncesIDs, shown.JobID)
 	}
 
-	if len(shownAnnounces) != 0 {
-		if ud.Schedule != "" {
-			if err = DB.Socket.Limit(50).Where("LOWER(name) like ? and expierence = ? and schedule = ? and  item_id not in ?", "%"+strings.ToLower(ud.VacancyName)+"%", expierence, ud.Schedule, shownAnnouncesIDs).Find(&announces).Error; err != nil {
+	locationsTarget := areas.FindContainLocationIDsList(ud.Location)
+	if len(locationsTarget) == 0 {
+		if len(shownAnnounces) != 0 {
+			if err = DB.Socket.Limit(50).Where("LOWER(name) like ? and expierence = ? and schedule = ? and  item_id not in ? ", "%"+strings.ToLower(ud.VacancyName)+"%", expierence, ud.Schedule, shownAnnouncesIDs).Find(&announces).Error; err != nil {
 				err = fmt.Errorf("db vacancy with param schedule getting error: %w", err)
 				return
 			}
+
 		} else {
-			if err = DB.Socket.Limit(50).Where("LOWER(name) like ? and expierence = ? and  item_id not in ?", "%"+strings.ToLower(ud.VacancyName)+"%", expierence, shownAnnouncesIDs).Find(&announces).Error; err != nil {
-				err = fmt.Errorf("db vacancy without param schedule getting error: %w", err)
+
+			if err = DB.Socket.Limit(50).Where("LOWER(name) like ? and expierence = ? and schedule = ?", "%"+strings.ToLower(ud.VacancyName)+"%", expierence, ud.Schedule).Find(&announces).Error; err != nil {
+				err = fmt.Errorf("db vacancy with param schedule getting error: %w", err)
 				return
 			}
+
 		}
 	} else {
-		if ud.Schedule != "" {
-			if err = DB.Socket.Limit(50).Where("LOWER(name) like ? and expierence = ? and schedule = ? ", "%"+strings.ToLower(ud.VacancyName)+"%", expierence, ud.Schedule).Find(&announces).Error; err != nil {
+		if len(shownAnnounces) != 0 {
+
+			if err = DB.Socket.Limit(50).Where("LOWER(name) like ? and expierence = ? and schedule = ? and  item_id not in ? and area in ?", "%"+strings.ToLower(ud.VacancyName)+"%", expierence, ud.Schedule, shownAnnouncesIDs, locationsTarget).Find(&announces).Error; err != nil {
 				err = fmt.Errorf("db vacancy with param schedule getting error: %w", err)
 				return
 			}
+
 		} else {
-			if err = DB.Socket.Limit(50).Where("LOWER(name) like ? and expierence = ? ", "%"+strings.ToLower(ud.VacancyName)+"%", expierence).Find(&announces).Error; err != nil {
-				err = fmt.Errorf("db vacancy without param schedule getting error: %w", err)
+
+			if err = DB.Socket.Limit(50).Where("LOWER(name) like ? and expierence = ? and schedule = ?  and area in ?", "%"+strings.ToLower(ud.VacancyName)+"%", expierence, ud.Schedule, locationsTarget).Find(&announces).Error; err != nil {
+				err = fmt.Errorf("db vacancy with param schedule getting error: %w", err)
 				return
 			}
+
 		}
 	}
 

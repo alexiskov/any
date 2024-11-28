@@ -26,7 +26,7 @@ func StartWorker(ctx context.Context, b *bot.Bot) {
 		}
 
 		for _, ud := range uds {
-			a, err := ud.GetJobAnnounces()
+			a, err := ud.GetJobAnnounces(areas)
 			if err != nil {
 				logger.Error(err.Error())
 				continue

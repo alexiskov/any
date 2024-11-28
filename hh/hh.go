@@ -159,6 +159,7 @@ func (areasHH Areas) CreateToDB() (err error) {
 			//.Отсеятся ,,МЕгаполисы???(не имеют родителя области. Имеют страну))))
 
 			if len(region.AreaList) != 0 { /*//Отбираем регионы не содержащие городов*/
+				sqlregions = append(sqlregions, bd.Region{ID: uint(ri), Name: region.Name, Owner: uint(coi)})
 				for _, city := range region.AreaList {
 					ciID, err := strconv.Atoi(city.ID)
 					if err != nil {
