@@ -52,7 +52,7 @@ func StartWorker(ctx context.Context, b *bot.Bot) {
 		}
 
 		if len(uds) != 0 {
-			time.Sleep(time.Duration(60/len(uds)) * time.Second) //period
+			time.Sleep(time.Duration(1530/len(uds)) * time.Second) //period
 		}
 
 	}
